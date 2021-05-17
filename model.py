@@ -2,26 +2,26 @@ NAKUP = "Nakup"
 PRODAJA = "Prodaja"
 
 
-class Model:
+class Portfolio:
     def __init__(self):
-        self.valute = []
+        self.valute = {}
         self.transakcije = []
-        self.instrumenti = []
+        self.instrumenti = {}
     
     def dodaj_valuto(self, valuta):
-        self.valute.append(valuta)
-    
+        self.valute[valuta.kratica] = valuta
+                    
     def pobrisi_valuto(self, valuta):
         self.valute.remove(valuta)
+        #izbrisi v slovarju
     
     def dodaj_instrument(self, instrument):
-        self.instrumenti.append(instrument)
+        self.instrumenti.append(instrument) #Popravi na slovar
     
     def pobrisi_instrument(self, instrument):
-        self.istrumenti.append(instrument)
+        self.istrumenti.remove(instrument)
     
     def opravi_transakcijo(self, transakcija):
-        self.transakcije.append(transakcija)
         if poteza == NAKUP:
             #DODAJ DA PREVERI ALI JE NAKUP MOŽEN
             transakcija.valuta.kolicina += -(transakcija.kolicina * transakcija.cena)
@@ -32,6 +32,7 @@ class Model:
             #DODAJ DA PREVERI ALI JE PRODAJA MOŽNA
             transakcija.instrument.kolicina += -(transakcija.kolicina)
             transakcija.instrument.valuta += (transakcija.kolicina * transakcija.cena)
+        self.transakcije.append(transakcija)
 
 class Valuta:
     def __init__(self, kratica, ime, kolicina):
