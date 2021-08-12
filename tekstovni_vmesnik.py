@@ -1,8 +1,10 @@
-from model import Portfolio, Valuta, Instrument, Transakcija
+from model import Portfolio, Valuta, Instrument, Transakcija #, Uporabnik
 ###########################################################
 # Pomožne funkcije za prikaz
 ###########################################################
-testni_portfelj = Portfolio("EUR")
+
+testna_valuta = ("EUR", "EURO", 0)
+testni_portfelj = Portfolio("Evropa delnice", testna_valuta)
 
 def krepko(niz):
     return f"\033[1m{niz}\033[0m"
@@ -64,8 +66,10 @@ def tekstovni_vmesnik():
             print()
             print(krepko("Kaj bi radi naredili?"))
             moznosti = [
-                ("dodal instrument", kupi_instrument),
-                ("izbrisal instrument", izbrisi_instrument),
+                ("nalozi sredstva", nalozi_sredstva),
+                ("dvigni sredstva", dvigni_sredstva),
+                ("kupil instrument", kupi_instrument),
+                ("prodal instrument", prodaj_instrument),
                 ("izpisek instrumentov", izpis_instrumentov),
                 ("pogledal stanje", izpis_stanja),
             ]
@@ -81,6 +85,20 @@ def tekstovni_vmesnik():
             print()
             print("Nasvidenje!")
             return
+#def ustvari_portfelj():
+#    print("Prosimo vnesite sledeče podatke: ")
+#    ime_portfelja = input("> Ime portfelja: ")
+#    valuta = input(" Valuta: ")
+#    portfelj = Portfolio(ime_portfelja, valuta)
+#   janez.dodaj_portfelj(portfelj)
+
+def nalozi_sredstva():
+    koliko_zelite_naloziti = input("> Koliko denarja zelite naloziti: ")   
+    testni_portfelj.nalozi_sredstva(koliko_zelite_naloziti)
+    print(f"Uspesno ste nalozili sredstva, trenutno imate na racunu {testni_portfelj.valuta.kolicina} {testni_portfelj.valuta.kratica}") 
+
+def dvigni_sredstva():
+    pass
 
 def kupi_instrument():
     print("Prosimo vnesite sledeče podatke: ")
@@ -92,7 +110,14 @@ def kupi_instrument():
     transakcija = Transakcija("Nakup", instrument, kolicina, cena, valuta)
     testni_portfelj.opravi_transakcijo(transakcija)
 
+def prodaj_instrument():
+    pass
 
+def izpis_instrumentov():
+    pass
+
+def izpis_stanja():
+    pass
 
 def uvodni_pozdrav():
     print(krepko("Pozdravljeni!"))
