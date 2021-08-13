@@ -3,7 +3,7 @@ from model import Portfolio, Valuta, Instrument, Transakcija #, Uporabnik
 # Pomožne funkcije za prikaz
 ###########################################################
 
-testna_valuta = ("EUR", "EURO", 0)
+testna_valuta = Valuta("EUR", "Euro", 0)
 testni_portfelj = Portfolio("Evropa delnice", testna_valuta)
 
 def krepko(niz):
@@ -94,18 +94,23 @@ def tekstovni_vmesnik():
 
 def nalozi_sredstva():
     koliko_zelite_naloziti = input("> Koliko denarja zelite naloziti: ")   
-    testni_portfelj.nalozi_sredstva(koliko_zelite_naloziti)
+    testni_portfelj.povecaj_sredstva(int(koliko_zelite_naloziti))
     print(f"Uspesno ste nalozili sredstva, trenutno imate na racunu {testni_portfelj.valuta.kolicina} {testni_portfelj.valuta.kratica}") 
 
 def dvigni_sredstva():
-    pass
+    koliko_zelite_dvigniti = input("> Koliko denarja zelite dvigniti: ")   
+    testni_portfelj.zmanjsaj_sredstva(int(koliko_zelite_dvigniti))
+    print(f"Uspesno ste dvignili sredstva, trenutno imate na racunu {testni_portfelj.valuta.kolicina} {testni_portfelj.valuta.kratica}") 
 
 def kupi_instrument():
     print("Prosimo vnesite sledeče podatke: ")
     poteza = "Nakup"
-    instrument = input("> Kratica finančnega inštrumenta: ")
-    cena = input("> Nakupna cena enote finančnega inštrumenta: ") # tu je treba dodati moznost da cloveku ponudimo trenutno ceno
+    # ustvarjanje instrumenta
+    kratica = input("> Kratica finančnega inštrumenta: ")
+    ime = input("> Ime finančnega inštrumenta: ")
+    instrument = Instrument(kratica, ime)
     kolicina = input("> Število enot: ")
+    cena = int(input("> Nakupna cena enote finančnega inštrumenta: ")) # tu je treba dodati moznost da cloveku ponudimo trenutno ceno
     valuta = testni_portfelj.valuta  ##Tole bo treba se popraviti, (posplositi na poljuben portfelj)
     transakcija = Transakcija("Nakup", instrument, kolicina, cena, valuta)
     testni_portfelj.opravi_transakcijo(transakcija)
@@ -128,3 +133,5 @@ moznosti = [
                 ("pogledal instrumente", "odstrani_kuverto"),
                 ("pogledal stanje", "poglej_stanje"),
             ]
+
+tekstovni_vmesnik()

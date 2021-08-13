@@ -1,7 +1,4 @@
 from yahoofinancials import YahooFinancials
-NAKUP = "Nakup"
-PRODAJA = "Prodaja"
-
 
 #class Uporabnik:
 #    def __init__(self, ime_uporabnika):
@@ -16,17 +13,22 @@ PRODAJA = "Prodaja"
 
 
 class Portfolio:
-    def __init__(self, ime_portfelja,valuta):   # Razmisli, ali bi imel vec valut, ali zgolj eno osnovno valuto
+    def __init__(self, ime_portfelja, valuta):   # Razmisli, ali bi imel vec valut, ali zgolj eno osnovno valuto
         self.ime_portfelja = ime_portfelja
         self.valuta = valuta
-        self.transakcije = {}     # Slovar kjer so ključi instrumenti, in vrednosti transakcije opravljene na dolocenem instrumentu
+        self.transakcije = {}     # Slovar kjer so ključi ¸imena instrumentov, in vrednosti transakcije opravljene na dolocenem instrumentu
         self.instrumenti = []     # Seznam instrumentov  
     
-    def nalozi_sredstva(self, koliko_zelimo_naloziti):
-        self.valuta.kolicina += koliko_zelimo_naloziti
+    def __repr__(self):
+        return f"Portfolio({self.ime_portfelja}, {self.valuta})"
     
-    def dvigni_sredstva(self, koliko_zelimo_naloziti):
-        self.valuta.kolicina =- koliko_zelimo_naloziti
+    def povecaj_sredstva(self, koliko_zelimo_naloziti):
+        '''Poveca kolicino valute za zeljen znesek'''
+        self.valuta.kolicina += koliko_zelimo_naloziti
+
+    def zmanjsaj_sredstva(self, koliko_zelimo_naloziti):
+        '''Zmanjša kolicino valute za zeljen znesek'''
+        self.valuta.kolicina -= koliko_zelimo_naloziti
 
     def dodaj_instrument(self, instrument):
         self.instrumenti.append(instrument) 
@@ -35,16 +37,19 @@ class Portfolio:
         self.instrumenti.remove(instrument)
     
     def opravi_transakcijo(self, transakcija):
-        if poteza == NAKUP:
+        #dodamo transakcijo v portfelj
+        if transakcija.instrument.ime not in self.transakcije:
+            self.transakcije[transakcija.instrument.ime] = [transakcija]
+        else:
+            self.transakcije[transakcija.instrument.ime].append(transakcija)
+        #dodamo instrument v portfelj ter povecamo oz. zmanjsamo stanje na valuti
+        if transakcija.poteza == "Nakup":
             if not transakcija.instrument in self.instrumenti:
-                self.dodaj_instrument()
-            transakcija.instrument += transakcija.kolicina
-        elif poteza == PRODAJA:
-            #DODAJ DA PREVERI ALI JE PRODAJA MOŽNA
-            transakcija.instrument.kolicina += -(transakcija.kolicina)
-            transakcija.instrument.valuta += (transakcija.kolicina * transakcija.cena)
-        self.transakcije.append(transakcija)
-
+                self.dodaj_instrument(transakcija.instrument)
+            self.zmanjsaj_sredstva(transakcija.cena * transakcija.kolicina)
+        elif transakcija.poteza == "Prodaja":
+            self.povecaj_sredstva(transakcija.cena * transakcija.kolicina)
+            
 class Valuta:
     def __init__(self, kratica, ime, kolicina):
         self.kratica = kratica
@@ -55,34 +60,59 @@ class Valuta:
         return f"Valuta({self.kratica}, {self.ime}, {self.kolicina})"
     
     def __str__(self):
-        return f"self.ime"         
+        return f"{self.ime}"         
 
 class Instrument:
-    def __init__(self, kratica, ime, portfolio):
+    def __init__(self, kratica, ime, portfelj):
         self.kratica = kratica
         self.ime = ime
-        self.portfolio = portfolio
+        self.portfelj = portfelj
         self.cena = YahooFinancials(kratica).get_current_price()
-    
-    # DODAJ METODI VLOZENO in KOLICINA(izracunaj iz transakcij)
 
     def __repr__(self):
-        return f"Instrument({self.kratica}, {self.ime}, {self.portfolio})"
+        return f"Instrument({self.kratica}, {self.ime}, {self.portfelj})"
 
     def __str__(self):
-        return f"self.ime"
+        return f"{self.ime}"
+        
+    # DODAJ METODI VLOZENO in KOLICINA(izracunaj iz transakcij) 
+    def kolicina(self):
+        kolicina = 0
+        for transakcija in self.portfelj.transakcije[self.ime]:
+            if transakcija.poteza == "Nakup":
+                kolicina += transakcija.kolicina
+            elif transakcija.poteza == "Prodaja":
+                kolicina -= transakcija.kolicina
+        return kolicina
     
-
+    def neto_vlozeno(self):
+        vlozeno = 0
+        for transakcija in self.portfelj.transakcije[self.ime]:
+            if transakcija.poteza == "Nakup":
+                vlozeno += (transakcija.cena * transakcija.kolicina)
+            elif transakcija.poteza == "Prodaja":
+                vlozeno -= (transakcija.cena * transakcija.kolicina)
+        return vlozeno
 
 class Transakcija:
     def __init__(self, poteza, instrument, kolicina, cena, valuta):
-        self.poteza = poteza #nakup/prodaja
+        self.poteza = poteza # nakup/prodaja
         self.kolicina = kolicina
-        self.cena = cena #tu daj moznost da clovek bodisi izbere svojo ceno, ali pa kar trzno ceno v tistem trenutku
+        self.cena = cena ## tu daj moznost da clovek bodisi izbere svojo ceno, ali pa kar trzno ceno v tistem trenutku
         self.instrument = instrument
         self.valuta = valuta
+    
+    def __repr__(self):
+        return f"Transakcija({self.poteza}, {self.kolicina}, {self.cena}, {self.instrument}, {self.valuta}"
+    def __str__(self):
+        return f"Transakcija({self.poteza}, {self.kolicina}, {self.cena}, {self.instrument}, {self.valuta}"
 
 valuta1 = Valuta("EUR", "Euro", 0) 
 portfelj1 = Portfolio("Slovenija", valuta1)
+instrument1 = Instrument("KRK.WA", "Krka d.d.", portfelj1)
+transakcija1 = Transakcija("Nakup", instrument1, 100, 30, valuta1)
+transakcija2 = Transakcija("Nakup", instrument1, 200, 40, valuta1)
+transakcija3 = Transakcija("Prodaja", instrument1, 100, 50, valuta1)
+portfelj1.opravi_transakcijo(transakcija1)
 
 
