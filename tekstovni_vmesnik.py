@@ -59,28 +59,36 @@ def izberi(seznam):
 def tekstovni_vmesnik():
     uvodni_pozdrav()
     while True:
-        print(80 * "=")
-        #povzetek_stanja()
-        print()
-        print(krepko("Kaj bi radi naredili?"))
-        if testni_model.trenutni_portfelj == 0:
-            pass
-        else:
-            print(dobro(f"Vaš trenutni aktivni portfelj je: {testni_model.trenutni_portfelj.ime_portfelja}"))
-        moznosti = [
-            ("izberi aktivni portfelj", izberi_aktivni_portfelj),
-            ("dodal portfelj", dodaj_portfelj),
-            ("nalozi sredstva", nalozi_sredstva),
-            ("dvigni sredstva", dvigni_sredstva),
-            ("kupil instrument", kupi_instrument),
-            ("prodal instrument", prodaj_instrument),
-            ("izpisek instrumentov", izpis_instrumentov),
-            ("pogledal stanje", izpis_stanja),
-        ]
-        izbira = izberi(moznosti)
-        print(80 * "-")
-        izbira()
-
+        try:    
+            print(80 * "=")
+            #povzetek_stanja()
+            print()
+            print(krepko("Kaj bi radi naredili?"))
+            if testni_model.trenutni_portfelj == 0:
+                pass
+            else:
+                print(dobro(f"Vaš trenutni aktivni portfelj je: {testni_model.trenutni_portfelj.ime_portfelja}"))
+            moznosti = [
+                ("izberi aktivni portfelj", izberi_aktivni_portfelj),
+                ("dodal portfelj", dodaj_portfelj),
+                ("nalozi sredstva", nalozi_sredstva),
+                ("dvigni sredstva", dvigni_sredstva),
+                ("kupil instrument", kupi_instrument),
+                ("prodal instrument", prodaj_instrument),
+                ("izpisek instrumentov", izpis_instrumentov),
+                ("pogledal stanje sredstev", izpis_stanja_sredstev),
+            ]
+            izbira = izberi(moznosti)
+            print(80 * "-")
+            izbira()
+            print()
+            input("Pritisnite Enter za shranjevanje in vrnitev v osnovni meni...")
+        except KeyboardInterrupt:
+            print()
+            print("Nasvidenje")
+            return None
+        except ValueError as e:
+            print(slabo(e.args[0]))
             
 
 def dodaj_portfelj():
@@ -133,14 +141,13 @@ def kupi_instrument():
     instrument = Instrument(kratica, ime, portfelj)
     #ustvarjanje transakcije
     kolicina = vnesi_stevilo("> Število enot: ")
-    cena = vnesi_stevilo("> Nakupna cena enote finančnega inštrumenta: ") # tu je treba dodati moznost da cloveku ponudimo trenutno ceno
+    cena = instrument.cena
+    print(f"Trenutna cena ene enote instrumenta je {cena} {instrument.portfelj.valuta}")    
     transakcija = Transakcija("Nakup", instrument, kolicina, cena, portfelj)
     portfelj.opravi_transakcijo(transakcija)
-    print(f"Uspesno ste kupili {kolicina} enot " + krepko(f"{instrument.ime}."))
+    print(f"Uspešno ste kupili {kolicina} enot " + krepko(f"{instrument.ime}. Na voljo imate še " f"{portfelj.kolicina_valute} {portfelj.valuta}"))
 
 def prodaj_instrument():
-    print("Prosimo vnesite sledeče podatke: ")
-    poteza = "Prodaja"
     #ustvarjanje instrumenta
     portfelj = testni_model.trenutni_portfelj
     if portfelj.instrumenti == []:
@@ -153,17 +160,21 @@ def prodaj_instrument():
     instrument = izberi(moznosti)
     #ustvarjanje transakcije
     kolicina = vnesi_stevilo("> Število enot: ")
-    cena = vnesi_stevilo("> Nakupna cena enote finančnega inštrumenta: ") # tu je treba dodati moznost da cloveku ponudimo trenutno ceno
-    transakcija = Transakcija("Nakup", instrument, kolicina, cena, portfelj)
+    cena = instrument.cena
+    print(f"Trenutna cena ene enote instrumenta je {cena} {instrument.portfelj.valuta}")
+    transakcija = Transakcija("Prodaj", instrument, kolicina, cena, portfelj)
     portfelj.opravi_transakcijo(transakcija)
-    print(f"Uspesno ste kupili {kolicina} enot " + krepko(f"{instrument.ime}."))
+    print(f"Uspesno ste prodali {kolicina} enot " + krepko(f"{instrument.ime}."))
 
 
 def izpis_instrumentov():
-    pass
+    portfelj = testni_model.trenutni_portfelj
+    for instrument in portfelj.instrumenti:
+        print(f"{instrument.ime}, {instrument.kolicina()}, {instrument.cena} {portfelj.valuta}")
 
-def izpis_stanja():
-    pass
+def izpis_stanja_sredstev():
+    portfelj = testni_model.trenutni_portfelj
+    print(f"{portfelj.kolicina_valute} {portfelj.valuta}")
 
 def uvodni_pozdrav():
     print(krepko("Pozdravljeni!"))
@@ -173,4 +184,5 @@ def uvodni_pozdrav():
 evropa = Portfelj("Evropa", "EUR")
 testni_model.dodaj_portfelj(evropa)
 testni_model.trenutni_portfelj = evropa
+evropa.povecaj_sredstva(10000)
 tekstovni_vmesnik()

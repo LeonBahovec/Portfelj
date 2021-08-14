@@ -47,30 +47,42 @@ class Portfelj:
         self.kolicina_valute -= koliko_zelimo_naloziti
 
     def dodaj_instrument(self, instrument):
-        self.instrumenti.append(instrument) 
+        if instrument not in self.instrumenti:
+            self.instrumenti.append(instrument)
+        else:
+            return None
     
-    def pobrisi_instrument(self, instrument):
-        self.instrumenti.remove(instrument)
+    def pobrisi__prazen_instrument(self, instrument):
+        if instrument.kolicina() == 0:
+            self.instrumenti.remove(instrument)
+        else:
+            return None
     
     def opravi_transakcijo(self, transakcija):
+        #dodamo instrument v portfelj ter povecamo oz. zmanjsamo stanje na valuti
+        if transakcija.poteza == "Nakup":
+            if self.kolicina_valute >= transakcija.cena * transakcija.kolicina:
+                if not transakcija.instrument in self.instrumenti:
+                    self.dodaj_instrument(transakcija.instrument)
+                self.zmanjsaj_sredstva(transakcija.cena * transakcija.kolicina)
+            else:
+                raise ValueError("Nimate dovolj denarnih sredstev za nakup instrumenta!")
+        elif transakcija.poteza == "Prodaja":
+            if transakcija.instrument.kolicina() < transakcija.kolicina:
+                raise ValueError("Na voljo imate premajhno kolicino finančnega inštrumenta. Poskusite s prodajo na prazno")
+            self.povecaj_sredstva(transakcija.cena * transakcija.kolicina)
+            self.pobrisi_prazen_instrument(transakcija.instrument)
         #dodamo transakcijo v portfelj
         if transakcija.instrument.kratica not in self.transakcije:
             self.transakcije[transakcija.instrument.kratica] = [transakcija]
         else:
             self.transakcije[transakcija.instrument.kratica].append(transakcija)
-        #dodamo instrument v portfelj ter povecamo oz. zmanjsamo stanje na valuti
-        if transakcija.poteza == "Nakup":
-            if not transakcija.instrument in self.instrumenti:
-                self.dodaj_instrument(transakcija.instrument)
-            self.zmanjsaj_sredstva(transakcija.cena * transakcija.kolicina)
-        elif transakcija.poteza == "Prodaja":
-            self.povecaj_sredstva(transakcija.cena * transakcija.kolicina)
     
     def vrednost_portfelja(self):
-        vrednost_portfelja = 0
+        vrednost_instrumentov = 0
         for instrument in self.instrumenti:
-            vrednost_portfelja += instrument.trenutna_vrednost_instrumenta()
-        return vrednost_portfelja
+            vrednost_instrumentov += instrument.trenutna_vrednost_instrumenta()
+        return vrednost_instrumentov + self.kolicina_valute
                    
 
 class Instrument:
@@ -117,19 +129,20 @@ class Transakcija:
         self.portfelj = portfelj
     
     def __repr__(self):
-        return f"Transakcija({self.poteza}, {self.kolicina}, {self.cena}, {self.instrument}, {self.portfelj}"
+        return f"Transakcija({self.poteza}, {self.instrument}, {self.kolicina}, {self.cena}, {self.portfelj}"
     def __str__(self):
-        return f"Transakcija({self.poteza}, {self.kolicina}, {self.cena}, {self.instrument}, {self.portfelj}"
+        return f"Transakcija({self.poteza}, {self.instrument}, {self.kolicina}, {self.cena}, {self.portfelj}"
 
 
 model1 = Model()
 portfelj1 = Portfelj("Slovenija", "EUR")
-instrument1 = Instrument("KRK.WA", "Krka d.d.", portfelj1)
+portfelj1.povecaj_sredstva(10000)
+instrument1 = Instrument("AAPL", "Krka d.d.", portfelj1)
 transakcija1 = Transakcija("Nakup", instrument1, 100, 30, portfelj1)
 transakcija2 = Transakcija("Nakup", instrument1, 200, 40, portfelj1)
 transakcija3 = Transakcija("Prodaja", instrument1, 100, 50, portfelj1)
-model1.dodaj_portfelj(portfelj1)
+#model1.dodaj_portfelj(portfelj1)
 
-portfelj1.opravi_transakcijo(transakcija1)
+#portfelj1.opravi_transakcijo(transakcija1)
 
 
