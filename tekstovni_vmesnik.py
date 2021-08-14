@@ -137,15 +137,14 @@ def kupi_instrument():
     # ustvarjanje instrumenta
     portfelj = testni_model.trenutni_portfelj
     kratica = input("> Kratica finančnega inštrumenta: ")
-    ime = input("> Ime finančnega inštrumenta: ")
-    instrument = Instrument(kratica, ime, portfelj)
+    instrument = Instrument(kratica, portfelj)
     #ustvarjanje transakcije
     kolicina = vnesi_stevilo("> Število enot: ")
-    cena = instrument.cena
+    cena = instrument.cena()
     print(f"Trenutna cena ene enote instrumenta je {cena} {instrument.portfelj.valuta}")    
     transakcija = Transakcija("Nakup", instrument, kolicina, cena, portfelj)
     portfelj.opravi_transakcijo(transakcija)
-    print(f"Uspešno ste kupili {kolicina} enot " + krepko(f"{instrument.ime}. Na voljo imate še " f"{portfelj.kolicina_valute} {portfelj.valuta}"))
+    print(f"Uspešno ste kupili {kolicina} enot " + krepko(f"{instrument.ime()}. Na voljo imate še " f"{portfelj.kolicina_valute} {portfelj.valuta}"))
 
 def prodaj_instrument():
     #ustvarjanje instrumenta
@@ -170,7 +169,7 @@ def prodaj_instrument():
 def izpis_instrumentov():
     portfelj = testni_model.trenutni_portfelj
     for instrument in portfelj.instrumenti:
-        print(f"{instrument.ime}, {instrument.kolicina()}, {instrument.cena} {portfelj.valuta}")
+        print(f"{instrument.ime()}, {instrument.kolicina_instrumenta()}, {instrument.cena()} {portfelj.valuta}")
 
 def izpis_stanja_sredstev():
     portfelj = testni_model.trenutni_portfelj
