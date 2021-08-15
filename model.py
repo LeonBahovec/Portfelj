@@ -33,7 +33,7 @@ class Portfelj:
         self.valuta = valuta
         self.kolicina_valute = 0
         self.transakcije = {}     # Slovar kjer so ključi ¸kratice instrumentov, in vrednosti transakcije opravljene na dolocenem instrumentu
-        self.instrumenti = []     # Seznam instrumentov  
+        self.instrumenti = {}     # Seznam instrumentov  
     
     def __repr__(self):
         return f"Portfelj({self.ime_portfelja}, {self.valuta})"
@@ -47,16 +47,17 @@ class Portfelj:
         self.kolicina_valute -= koliko_zelimo_naloziti
 
     def dodaj_instrument(self, instrument):
-        if instrument not in self.instrumenti:
-            self.instrumenti.append(instrument)
+        if instrument.kratica not in self.instrumenti:
+            self.instrumenti[instrument.kratica] = instrument
         else:
             return None
     
     def pobrisi_prazen_instrument(self, instrument):
         if instrument.kolicina_instrumenta() == 0:
-            self.instrumenti.remove(instrument)
+            del self.instrumenti[instrument.kratica]
         else:
             return None
+    
     def dodaj_transakcijo(self, transakcija):
         if transakcija.instrument.kratica not in self.transakcije:
             self.transakcije[transakcija.instrument.kratica] = [transakcija]
@@ -92,18 +93,15 @@ class Instrument:
     def __init__(self, kratica, portfelj):
         self.kratica = kratica
         self.portfelj = portfelj
+        self.ime = YahooFinancials(self.kratica).get_stock_quote_type_data()[self.kratica]["shortName"]
+        self.cena = YahooFinancials(self.kratica).get_current_price()
+        
 
     def __repr__(self):
-        return f"Instrument({self.kratica}, {self.ime()}, {self.portfelj})"
+        return f"Instrument({self.kratica}, {self.ime}, {self.portfelj})"
 
     def __str__(self):
         return f"{self.ime}"
-    
-    def cena(self):
-        return YahooFinancials(self.kratica).get_current_price()
-
-    def ime(self):
-        return YahooFinancials(self.kratica).get_stock_quote_type_data()[self.kratica]["shortName"]
     
     def kolicina_instrumenta(self):
         kolicina = 0
@@ -139,16 +137,59 @@ class Transakcija:
     def __str__(self):
         return f"Transakcija({self.poteza}, {self.instrument}, {self.kolicina}, {self.cena}, {self.portfelj}"
 
-
-model1 = Model()
-portfelj1 = Portfelj("Slovenija", "EUR")
-portfelj1.povecaj_sredstva(10000)
-instrument1 = Instrument("AAPL", portfelj1)
-transakcija1 = Transakcija("Nakup", instrument1, 100, 30, portfelj1)
-transakcija2 = Transakcija("Nakup", instrument1, 200, 40, portfelj1)
-transakcija3 = Transakcija("Prodaja", instrument1, 100, 50, portfelj1)
-model1.dodaj_portfelj(portfelj1)
-
-portfelj1.opravi_transakcijo(transakcija1)
-
+#i = 1
+#model1 = Model()
+#evropa1 = Portfelj("Evropa", "EUR")
+#model1.dodaj_portfelj(evropa1)
+#model1.trenutni_portfelj = evropa1
+#evropa1.povecaj_sredstva(100000)
+#
+#portfelj = model1.trenutni_portfelj
+#print(i, portfelj.instrumenti) #1
+#i += 1
+#kratica = "AAPL"
+#print(i, portfelj.instrumenti) #2
+#i += 1
+#instrument = Instrument(kratica, portfelj)
+#print(i, portfelj.instrumenti) #3
+#i += 1
+#kolicina = 100
+#print(i, portfelj.instrumenti) #4
+#i += 1
+#cena = instrument.cena
+#print(i, portfelj.instrumenti) #5
+#i += 1
+#transakcija = Transakcija("Nakup", instrument, kolicina, cena, portfelj)
+#print(i, portfelj.instrumenti) #6
+#i += 1
+#portfelj.opravi_transakcijo(transakcija)
+#print(i, portfelj.instrumenti) #7
+#i += 1
+#portfelj = model1.trenutni_portfelj
+#print(i, portfelj.instrumenti) #8
+#i += 1
+#kratica = "AAPL"
+#print(i, portfelj.instrumenti)# 9
+#i += 1
+#instrument = Instrument(kratica, portfelj)
+#print(i, portfelj.instrumenti) #10
+#i += 1
+#kolicina = 50
+#print(i, portfelj.instrumenti) #11
+#i += 1
+#cena = instrument.cena
+#print(i, portfelj.instrumenti) #12 
+#i += 1
+#transakcija = Transakcija("Prodaja", instrument, kolicina, cena, portfelj)
+#print(i, portfelj.instrumenti) #13
+#i += 1
+#portfelj.opravi_transakcijo(transakcija) #14!!
+#print(i, portfelj.instrumenti)
+#i += 1
+#portfelj = model1.trenutni_portfelj
+#print(i, portfelj.instrumenti)
+#i += 1
+#for instrument in portfelj.instrumenti.values():
+#    
+#    print(f"{instrument.ime}, {instrument.kolicina_instrumenta()}, {instrument.cena} {portfelj.valuta}")
 
