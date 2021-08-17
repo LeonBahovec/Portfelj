@@ -1,4 +1,6 @@
 from model import Model, Portfelj, Instrument, Transakcija #, Uporabnik
+import datetime
+import json
 ###########################################################
 # Pomožne funkcije za prikaz
 ###########################################################
@@ -94,10 +96,11 @@ def tekstovni_vmesnik():
 def dodaj_portfelj():
     print("Prosimo vnesite sledeče podatke: ")
     ime_portfelja = input("> Ime portfelja: ")
-#!! #for portfelj in testni_model.portfelji:
-    #    if ime_portfelja == portfelj.ime_portfelja:
-    #        print("Portfelj s takim imenom že obstaja, poskusite ponovno!")
-    #        dodaj_portfelj()
+    for portfelj in testni_model.portfelji.values():
+        if ime_portfelja == portfelj.ime_portfelja:
+            print("Portfelj s takim imenom že obstaja, poskusite ponovno!")
+            print("Prosimo izberite novo ime!")
+            ime_portfelja = input("> Ime portfelja: ")
     valuta = input(" Valuta (prosimo vnesite 3-mestno kratico): ")
     portfelj = Portfelj(ime_portfelja, valuta)
     testni_model.dodaj_portfelj(portfelj)
@@ -142,7 +145,7 @@ def kupi_instrument():
     kolicina = vnesi_stevilo("> Število enot: ")
     cena = instrument.cena
     print(f"Trenutna cena ene enote instrumenta je {cena} {instrument.portfelj.valuta}")    
-    transakcija = Transakcija("Nakup", instrument, kolicina, cena, portfelj)
+    transakcija = Transakcija("Nakup", instrument, kolicina, cena, datetime.date.today(), portfelj)
     portfelj.opravi_transakcijo(transakcija)
     print(f"Uspešno ste kupili {kolicina} enot " + krepko(f"{instrument.ime}. Na voljo imate še " f"{portfelj.kolicina_valute} {portfelj.valuta}"))
 
@@ -183,8 +186,10 @@ def uvodni_pozdrav():
     print("Za izhod pritisnite Ctrl-C.")
 
 
-evropa = Portfelj("Evropa", "EUR")
+evropa = Portfelj("Evropa delnice", "EUR")
+poljska = Portfelj("Poljska", "PLN")
 testni_model.dodaj_portfelj(evropa)
 testni_model.trenutni_portfelj = evropa
-evropa.povecaj_sredstva(10000)
+evropa.povecaj_sredstva(50000)
+poljska.povecaj_sredstva(30000)
 tekstovni_vmesnik()

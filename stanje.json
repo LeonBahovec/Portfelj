@@ -1,0 +1,27 @@
+{
+    "portfelji": [
+        {
+            "ime_portfelja": "Evropa",
+            "valuta": "USD",
+            "kolicina_valute": 184888.0,
+            "transakcije": [
+                {
+                    "poteza": "Nakup",
+                    "instrument": {
+                        "kratica": "AAPL",
+                        "ime": "Apple"
+                    },
+                    "kolicina": 100,
+                    "cena": 151.12,
+                    "datum": "2021-08-17"
+                }
+            ],
+            "instrumenti": [
+                {
+                    "kratica": "AAPL",
+                    "ime": "Apple"
+                }
+            ]
+        }
+    ]
+}

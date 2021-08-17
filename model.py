@@ -1,19 +1,10 @@
 from yahoofinancials import YahooFinancials
-
-#class Uporabnik:
-#    def __init__(self, ime_uporabnika):
-#        self.ime_uporabnika = ime_uporabnika
-#        self.portfelji = []
-#
-#    def dodaj_portfelj(self, portfelj):
-#        self.portfelji.append(portfelj)
-#    
-#    def izbrisi_portfelj(self, portfelj):
-#        self.portfelji.remove(portfelj)
+import datetime
+import json
 
 class Model:
     def __init__(self):
-        '''Model trenutno vsebuje zgolj seznam portfeljev'''
+        '''Model trenutno vsebuje zgolj slovar portfeljev'''
         self.portfelji = {}
         self.trenutni_portfelj = 0
     
@@ -23,15 +14,49 @@ class Model:
     def izbrisi_portfelj(self, portfelj):
         del self.portfelji[portfelj.ime_portfelja]
     
-    def vrednost_portfelja(self, portfelj):
-        pass
+    def v_slovar(self):
+        return {
+            "portfelji":[portfelj.v_slovar() for portfelj in self.portfelji.values()]
+        }
+    
+    @classmethod
+    def iz_slovarja(cls, slovar):
+        krovni_model = cls()
+        for portfelj_kot_slovar in slovar["portfelji"]:
+            portfelj = Portfelj(portfelj_kot_slovar["ime_portfelja"], portfelj_kot_slovar["valuta"])
+            portfelj.kolicina_valute = portfelj_kot_slovar["kolicina_valute"]
+            krovni_model.dodaj_portfelj(portfelj)
+            for transakcija_kot_slovar in portfelj_kot_slovar["transakcije"]:
+                transakcija = Transakcija(
+                    transakcija_kot_slovar["poteza"], 
+                    Instrument(transakcija_kot_slovar["instrument"]["kratica"], transakcija_kot_slovar["instrument"]["ime"], portfelj), 
+                    transakcija_kot_slovar["kolicina"], 
+                    transakcija_kot_slovar["cena"], 
+                    datetime.date.fromisoformat(transakcija_kot_slovar["datum"]), 
+                    portfelj
+                    )
+                portfelj.dodaj_transakcijo(transakcija)
+            for instrument_kot_slovar in portfelj_kot_slovar["instrumenti"]:
+                instrument = Instrument(instrument_kot_slovar["kratica"], instrument_kot_slovar["ime"], portfelj)
+                portfelj.dodaj_instrument(instrument)
+        return krovni_model
 
+    def shrani_datoteko(self, ime_datoteke):
+        with open(ime_datoteke, "w", encoding="utf-8") as datoteka:
+            slovar = self.v_slovar()
+            json.dump(slovar, datoteka)
+
+    @classmethod
+    def preberi_iz_datoteke(cls, ime_datoteke):
+        with open(ime_datoteke, "r", encoding="utf-8") as datoteka:
+            slovar = json.load(datoteka)
+            return Model.iz_slovarja(slovar)
 
 class Portfelj:
     def __init__(self, ime_portfelja, valuta):  
         self.ime_portfelja = ime_portfelja
         self.valuta = valuta
-        self.kolicina_valute = 0
+        self.kolicina_valute = 100000
         self.transakcije = {}     # Slovar kjer so ključi ¸kratice instrumentov, in vrednosti transakcije opravljene na dolocenem instrumentu
         self.instrumenti = {}     # Seznam instrumentov  
     
@@ -87,14 +112,48 @@ class Portfelj:
         for instrument in self.instrumenti:
             vrednost_instrumentov += instrument.trenutna_vrednost_instrumenta()
         return vrednost_instrumentov + self.kolicina_valute
-                   
+
+    def v_slovar(self):
+        seznam_transakcij = []
+        for seznam in self.transakcije.values():
+            for transakcija in seznam:
+                seznam_transakcij.append(transakcija)
+        return {
+            "ime_portfelja": self.ime_portfelja,
+            "valuta": self.valuta,
+            "kolicina_valute": self.kolicina_valute,            
+            "transakcije": [
+                {
+                    "poteza": transakcija.poteza,
+                    "instrument": {
+                        "kratica": transakcija.instrument.kratica,
+                        "ime": transakcija.instrument.ime,
+                    },
+                    "kolicina":transakcija.kolicina,
+                    "cena": transakcija.cena,
+                    "datum": datetime.date.isoformat(transakcija.datum),
+                }
+                for transakcija in seznam_transakcij
+            ],
+            "instrumenti": [
+                {
+                    "kratica": instrument.kratica,
+                    "ime": instrument.ime
+                }
+                for instrument in self.instrumenti.values()
+            ]
+        }
 
 class Instrument:
-    def __init__(self, kratica, portfelj):
+    def __init__(self, kratica, ime, portfelj):
         self.kratica = kratica
         self.portfelj = portfelj
-        self.ime = YahooFinancials(self.kratica).get_stock_quote_type_data()[self.kratica]["shortName"]
-        self.cena = YahooFinancials(self.kratica).get_current_price()
+        self.ime = ime
+        valuta_instrumenta = YahooFinancials(self.kratica).get_currency()
+        if valuta_instrumenta == portfelj.valuta:
+            self.cena = YahooFinancials(self.kratica).get_current_price()
+        else:
+            self.cena = YahooFinancials(self.kratica).get_current_price() / YahooFinancials((portfelj.valuta + valuta_instrumenta + "=X")).get_current_price()
         
 
     def __repr__(self):
@@ -124,72 +183,33 @@ class Instrument:
     def trenutna_vrednost_instrumenta(self):
         return self.cena * self.kolicina_instrumenta()
 
+
 class Transakcija:
-    def __init__(self, poteza, instrument, kolicina, cena, portfelj):
+    def __init__(self, poteza, instrument, kolicina, cena, datum, portfelj):
         self.poteza = poteza # nakup/prodaja
         self.instrument = instrument
         self.kolicina = kolicina  
-        self.cena = cena  ## tu daj moznost da clovek bodisi izbere svojo ceno, ali pa kar trzno ceno v tistem trenutku
+        self.cena = cena  
+        self.datum = datum
         self.portfelj = portfelj
+        
     
     def __repr__(self):
-        return f"Transakcija({self.poteza}, {self.instrument}, {self.kolicina}, {self.cena}, {self.portfelj}"
+        return f"Transakcija({self.poteza}, {self.instrument}, {self.kolicina}, {self.cena}, {self.datum.isoformat()}, {self.portfelj}"
     def __str__(self):
-        return f"Transakcija({self.poteza}, {self.instrument}, {self.kolicina}, {self.cena}, {self.portfelj}"
+        return f"Transakcija({self.poteza}, {self.instrument}, {self.kolicina}, {self.cena}, {self.datum.isoformat()}, {self.portfelj}"
 
-#i = 1
-#model1 = Model()
-#evropa1 = Portfelj("Evropa", "EUR")
-#model1.dodaj_portfelj(evropa1)
-#model1.trenutni_portfelj = evropa1
-#evropa1.povecaj_sredstva(100000)
-#
-#portfelj = model1.trenutni_portfelj
-#print(i, portfelj.instrumenti) #1
-#i += 1
-#kratica = "AAPL"
-#print(i, portfelj.instrumenti) #2
-#i += 1
-#instrument = Instrument(kratica, portfelj)
-#print(i, portfelj.instrumenti) #3
-#i += 1
-#kolicina = 100
-#print(i, portfelj.instrumenti) #4
-#i += 1
-#cena = instrument.cena
-#print(i, portfelj.instrumenti) #5
-#i += 1
-#transakcija = Transakcija("Nakup", instrument, kolicina, cena, portfelj)
-#print(i, portfelj.instrumenti) #6
-#i += 1
-#portfelj.opravi_transakcijo(transakcija)
-#print(i, portfelj.instrumenti) #7
-#i += 1
-#portfelj = model1.trenutni_portfelj
-#print(i, portfelj.instrumenti) #8
-#i += 1
-#kratica = "AAPL"
-#print(i, portfelj.instrumenti)# 9
-#i += 1
-#instrument = Instrument(kratica, portfelj)
-#print(i, portfelj.instrumenti) #10
-#i += 1
-#kolicina = 50
-#print(i, portfelj.instrumenti) #11
-#i += 1
-#cena = instrument.cena
-#print(i, portfelj.instrumenti) #12 
-#i += 1
-#transakcija = Transakcija("Prodaja", instrument, kolicina, cena, portfelj)
-#print(i, portfelj.instrumenti) #13
-#i += 1
-#portfelj.opravi_transakcijo(transakcija) #14!!
-#print(i, portfelj.instrumenti)
-#i += 1
-#portfelj = model1.trenutni_portfelj
-#print(i, portfelj.instrumenti)
-#i += 1
-#for instrument in portfelj.instrumenti.values():
-#    
-#    print(f"{instrument.ime}, {instrument.kolicina_instrumenta()}, {instrument.cena} {portfelj.valuta}")
+    def v_slovar(self):
+        return {
+            "poteza": self.poteza,
+            "instrument": self.instrument,
+            "kolicina":self.kolicina,
+            "cena": self.cena,
+            "datum": datetime.date.isoformat(self.datum),
+            "portfelj": self.portfelj,
+        }
+    
+    
+
+
 
