@@ -128,7 +128,3 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-yahoo_finance_test.py
-yahoo_financials_test.py
-skica_modela.png
-skica_spletnega_vmesnika.png
