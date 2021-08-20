@@ -1,3 +1,4 @@
+from os import stat
 from yahoofinancials import YahooFinancials
 import datetime
 import json
@@ -19,9 +20,9 @@ class Model:
             "portfelji":[portfelj.v_slovar() for portfelj in self.portfelji.values()]
         }
     
-    @classmethod
-    def iz_slovarja(cls, slovar):
-        krovni_model = cls()
+    @staticmethod
+    def iz_slovarja(slovar):
+        krovni_model = Model()
         for portfelj_kot_slovar in slovar["portfelji"]:
             portfelj = Portfelj(portfelj_kot_slovar["ime_portfelja"], portfelj_kot_slovar["valuta"])
             portfelj.kolicina_valute = portfelj_kot_slovar["kolicina_valute"]
@@ -46,8 +47,8 @@ class Model:
             slovar = self.v_slovar()
             json.dump(slovar, datoteka)
 
-    @classmethod
-    def preberi_iz_datoteke(cls, ime_datoteke):
+    @staticmethod
+    def preberi_iz_datoteke(ime_datoteke):
         with open(ime_datoteke, "r", encoding="utf-8") as datoteka:
             slovar = json.load(datoteka)
             return Model.iz_slovarja(slovar)
@@ -94,14 +95,14 @@ class Portfelj:
             if transakcija.cena * transakcija.kolicina <= self.kolicina_valute:
                 self.dodaj_transakcijo(transakcija)
                 self.dodaj_instrument(transakcija.instrument)
-                self.zmanjsaj_sredstva(transakcija.kolicina * transakcija.cena)
+                self.zmanjsaj_sredstva(round(transakcija.kolicina * transakcija.cena, 2))
             else:
                 raise ValueError("Nimate dovolj denarnih sredstev za nakup instrumenta!")
         elif transakcija.poteza == "Prodaja":
             if transakcija.kolicina <= transakcija.instrument.kolicina_instrumenta():
                 self.dodaj_transakcijo(transakcija)
                 self.dodaj_instrument(transakcija.instrument)
-                self.povecaj_sredstva(transakcija.kolicina * transakcija.cena)
+                self.povecaj_sredstva(round(transakcija.kolicina * transakcija.cena, 2))
                 if transakcija.instrument.kolicina_instrumenta() == 0:
                     self.pobrisi_prazen_instrument(transakcija.instrument)
             else:

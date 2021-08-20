@@ -5,7 +5,12 @@ import json
 # Pomožne funkcije za prikaz
 ###########################################################
 
-testni_model = Model()
+DATOTEKA_S_STANJEM = "stanje.json"
+
+try:
+    testni_model = Model.preberi_iz_datoteke(DATOTEKA_S_STANJEM)
+except FileNotFoundError:
+    testni_model = Model()
 
 def krepko(niz):
     return f"\033[1m{niz}\033[0m"
@@ -63,7 +68,6 @@ def tekstovni_vmesnik():
     while True:
         try:    
             print(80 * "=")
-            #povzetek_stanja()
             print()
             print(krepko("Kaj bi radi naredili?"))
             if testni_model.trenutni_portfelj == 0:
@@ -87,6 +91,7 @@ def tekstovni_vmesnik():
             input("Pritisnite Enter za shranjevanje in vrnitev v osnovni meni...")
         except KeyboardInterrupt:
             print()
+            testni_model.shrani_datoteko(DATOTEKA_S_STANJEM)
             print("Nasvidenje")
             return None
         except ValueError as e:
@@ -139,8 +144,9 @@ def kupi_instrument():
     # ustvarjanje instrumenta
     portfelj = testni_model.trenutni_portfelj
     kratica = input("> Kratica finančnega inštrumenta: ")
+    ime = input("> Ime inštrumenta: ")
     print("Nalaganje podatkov, prosimo počakajte par sekund!")
-    instrument = Instrument(kratica, portfelj)
+    instrument = Instrument(kratica, ime, portfelj)
     #ustvarjanje transakcije
     kolicina = vnesi_stevilo("> Število enot: ")
     cena = instrument.cena
@@ -186,10 +192,5 @@ def uvodni_pozdrav():
     print("Za izhod pritisnite Ctrl-C.")
 
 
-evropa = Portfelj("Evropa delnice", "EUR")
-poljska = Portfelj("Poljska", "PLN")
-testni_model.dodaj_portfelj(evropa)
-testni_model.trenutni_portfelj = evropa
-evropa.povecaj_sredstva(50000)
-poljska.povecaj_sredstva(30000)
+
 tekstovni_vmesnik()
