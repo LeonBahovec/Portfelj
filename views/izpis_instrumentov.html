@@ -1,0 +1,33 @@
+<div>
+    %if trenutni_portfelj.instrumenti == {}:
+    <p>TRENUTNO V PORTFELJU {{ trenutni_portfelj.ime_portfelja }} ŠE NIMATE NOBENIH INSTRUMENTOV</p>
+    %else:    
+    <p>V portfelju {{ trenutni_portfelj.ime_portfelja }} imate sledeče instrumente:</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Kratica</th>
+                <th>Ime</th>
+                <th>Kolicina</th>
+                <th>Cena enote</th>
+                <th>Trzna vrednost</th>
+                <th>Vlozeno</th>
+                <th>Dobicek</th>
+            </tr>
+        </thead>
+        <tbody>
+            %for instrument in trenutni_portfelj.instrumenti.values():
+            <tr>
+                <td>{{ instrument.kratica }}</td>
+                <td>{{ instrument.ime }}</td>
+                <td>{{ instrument.kolicina_instrumenta() }}</td>
+                <td>{{ instrument.cena }}</td>
+                <td>{{ instrument.cena * instrument.kolicina_instrumenta() }}</td>
+                <td>{{ instrument.neto_vlozeno }}</td>
+                <td>0%</td>
+            </tr>
+            %end
+        </tbody>
+    </table>
+    %end
+</div>

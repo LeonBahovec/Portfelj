@@ -1,7 +1,9 @@
 from os import stat
 from yahoofinancials import YahooFinancials
-import datetime
+from datetime import date
 import json
+
+
 
 class Model:
     def __init__(self):
@@ -33,7 +35,7 @@ class Model:
                     Instrument(transakcija_kot_slovar["instrument"]["kratica"], transakcija_kot_slovar["instrument"]["ime"], portfelj), 
                     transakcija_kot_slovar["kolicina"], 
                     transakcija_kot_slovar["cena"], 
-                    datetime.date.fromisoformat(transakcija_kot_slovar["datum"]), 
+                    date.fromisoformat(transakcija_kot_slovar["datum"]), 
                     portfelj
                     )
                 portfelj.dodaj_transakcijo(transakcija)
@@ -132,7 +134,7 @@ class Portfelj:
                     },
                     "kolicina":transakcija.kolicina,
                     "cena": transakcija.cena,
-                    "datum": datetime.date.isoformat(transakcija.datum),
+                    "datum": date.isoformat(transakcija.datum),
                 }
                 for transakcija in seznam_transakcij
             ],
@@ -184,6 +186,12 @@ class Instrument:
     def trenutna_vrednost_instrumenta(self):
         return self.cena * self.kolicina_instrumenta()
 
+    def donosnost(self):
+        vlozeno = self.neto_vlozeno
+        trenutna_vrednost = self.cena * self.kolicina_instrumenta
+        rezultat = round(((vlozeno / trenutna_vrednost) - 1) * 100)
+        return f"{rezultat} %"
+
 
 class Transakcija:
     def __init__(self, poteza, instrument, kolicina, cena, datum, portfelj):
@@ -206,7 +214,7 @@ class Transakcija:
             "instrument": self.instrument,
             "kolicina":self.kolicina,
             "cena": self.cena,
-            "datum": datetime.date.isoformat(self.datum),
+            "datum": date.isoformat(self.datum),
             "portfelj": self.portfelj,
         }
     
