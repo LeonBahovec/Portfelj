@@ -1,100 +1,97 @@
-<html>
-<head>
-    <title>Portfelj</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-</head>
-<body>
-    <div>
-        <h1>Pozdravljeni!</h1>
-        <hr>
-    </div>
-    
-    <div>
-        <p>Vaši portfelji:</p>
-        <ul>
+% rebase("base.html")
+
+%if sporocilo != None:
+<p> {{ sporocilo }}</p>
+%end
+
+
+
+
+
+<div>
+    <p>Vaši portfelji:</p>
+    <ul>
+        %for portfelj in portfelji:
+        <li>{{ portfelj.ime_portfelja }} {{portfelj.kolicina_valute }} {{ portfelj.valuta }} </li>
+        %end
+    </ul>
+    %if trenutni_portfelj == 0:
+    <p>Trenutno nimate nastavljenega aktivnega portfelja</p>
+    %else:
+    <p>Trenutno imate za aktivni portfelj nastavljen {{ trenutni_portfelj.ime_portfelja }}</p>
+    %end
+</div>
+
+
+<hr>
+
+<div>
+    <p>Nov portfelj</p>
+    <form action="/dodaj-portfelj/" method="POST">
+        <input type="text" name="ime_portfelja" placeholder="ime portfelja">
+        <br>
+        <br>
+        <input type="text" name="valuta" placeholder="valuta">
+        <br>
+        <br>
+        <input type="submit" value="Dodaj portfelj">
+    </form>
+</div>
+
+<hr>
+
+<div>
+    <p>Zamenjaj aktivni portfelj</p>
+    <form action="/zamenjaj-portfelj/" method="POST">
+        <select name="trenutni_portfelj" id="trenutni_portfelj">
+            <option value="a" selected disabled hidden>izberi portfelj</option>
             %for portfelj in portfelji:
-            <li>{{ portfelj.ime_portfelja }} {{portfelj.kolicina_valute }} {{ portfelj.valuta }} </li>
+            <option value="{{ portfelj.ime_portfelja }}">{{ portfelj.ime_portfelja }}</option>
             %end
-        </ul>
-        %if trenutni_portfelj == 0:
-        <p>Trenutno nimate nastavljenega aktivnega portfelja</p>
-        %else:
-        <p>Trenutno imate za aktivni portfelj nastavljen {{ trenutni_portfelj.ime_portfelja }}</p>
-        %end
-    </div>
+        </select>     
+        <input type="submit" value="Zamenjaj portfelj">       
+    </form>
+       
+</div>
 
-
+<div>
+    %if trenutni_portfelj == 0:
+    <p>IZBERITE AKTIVNI PORTFELJ</p>
+    %elif trenutni_portfelj.instrumenti == {}:
+    <p>TRENUTNO V PORTFELJU {{ trenutni_portfelj.ime_portfelja }} ŠE NIMATE NOBENIH INSTRUMENTOV</p>
+    %else:    
+    <p>V portfelju {{ trenutni_portfelj.ime_portfelja }} imate sledeče instrumente:</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Kratica</th>
+                <th>Ime</th>
+                <th>Kolicina</th>
+                <th>Cena enote</th>
+                <th>Trzna vrednost</th>
+                <th>Vlozeno</th>
+                <th>Donos</th>
+            </tr>
+        </thead>
+        <tbody>
+            %for instrument in trenutni_portfelj.instrumenti.values():
+            <tr>
+                <td>{{ instrument.kratica }}</td>
+                <td>{{ instrument.ime }}</td>
+                <td>{{ instrument.kolicina_instrumenta() }}</td>
+                <td>{{ round(instrument.cena, 2) }}</td>
+                <td>{{ round(instrument.cena * instrument.kolicina_instrumenta(), 2) }}</td>
+                <td>{{ round(instrument.neto_vlozeno(), 2) }}</td>
+                <td>{{ instrument.donosnost() }}</td>
+            </tr>
+            %end
+        </tbody>
+    </table>
+    <br>
     <hr>
+    %end
 
-    <div>
-        <p>Nov portfelj</p>
-        <form action="/dodaj-portfelj/" method="POST">
-            <input type="text" name="ime_portfelja" placeholder="ime portfelja">
-            <br>
-            <br>
-            <input type="text" name="valuta" placeholder="valuta">
-            <br>
-            <br>
-            <input type="submit" value="Dodaj portfelj">
-        </form>
-    </div>
-    
-    <hr>
-
-    <div>
-        <p>Zamenjaj aktivni portfelj</p>
-        <form action="/zamenjaj-portfelj/" method="POST">
-            <select name="trenutni_portfelj" id="trenutni_portfelj">
-                <option value="a" selected disabled hidden>izberi portfelj</option>
-                %for portfelj in portfelji:
-                <option value="{{ portfelj.ime_portfelja }}">{{ portfelj.ime_portfelja }}</option>
-                %end
-            </select>     
-            <input type="submit" value="Zamenjaj portfelj">       
-        </form>
-           
-    </div>
-
-    <div>
-        %if trenutni_portfelj == 0:
-        <p>IZBERITE AKTIVNI PORTFELJ</p>
-        %if trenutni_portfelj.instrumenti == {}:
-        <p>TRENUTNO V PORTFELJU {{ trenutni_portfelj.ime_portfelja }} ŠE NIMATE NOBENIH INSTRUMENTOV</p>
-        %else:    
-        <p>V portfelju {{ trenutni_portfelj.ime_portfelja }} imate sledeče instrumente:</p>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Kratica</th>
-                    <th>Ime</th>
-                    <th>Kolicina</th>
-                    <th>Cena enote</th>
-                    <th>Trzna vrednost</th>
-                    <th>Vlozeno</th>
-                    <th>Donos</th>
-                </tr>
-            </thead>
-            <tbody>
-                %for instrument in trenutni_portfelj.instrumenti.values():
-                <tr>
-                    <td>{{ instrument.kratica }}</td>
-                    <td>{{ instrument.ime }}</td>
-                    <td>{{ instrument.kolicina_instrumenta() }}</td>
-                    <td>{{ instrument.cena }}</td>
-                    <td>{{ instrument.cena * instrument.kolicina_instrumenta() }}</td>
-                    <td>{{ instrument.neto_vlozeno() }}</td>
-                    <td>{{ instrument.donosnost()</td>
-                </tr>
-                %end
-            </tbody>
-        </table>
-        %end
-    </div>
-
-</body>
-
-
-
-
-
-</html>
+    <form action="/obrazec-za-nakup/">
+        <input type="SUBMIT" value="KUPI INSTRUMENT">
+    </form>
+</div>

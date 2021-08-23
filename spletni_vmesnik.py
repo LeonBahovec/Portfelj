@@ -13,7 +13,8 @@ except FileNotFoundError:
 @bottle.get("/")
 def osnovna_stran():
     return bottle.template(
-        "zacetna_stran.html", 
+        "zacetna_stran.html",
+        sporocilo=None, 
         portfelji=testni_model.portfelji.values(),
         trenutni_portfelj=testni_model.trenutni_portfelj
     )
@@ -34,6 +35,39 @@ def zamenjaj_portfelj():
         (bottle.request.forms.getunicode("trenutni_portfelj"))
         ]
     bottle.redirect("/")
+
+@bottle.get("/obrazec-za-nakup/")
+def obrazec_za_nakup():
+    return bottle.template(
+        "obrazec_za_nakup.html",
+        portfelji=testni_model.portfelji.values())
+
+@bottle.post("/opravi-nakup/")
+def opravi_nakup():
+    portfelj = testni_model.portfelji[bottle.request.forms.getunicode("izberi_portfelj")]
+    instrument = Instrument(
+        bottle.request.forms.getunicode("kratica"),
+        bottle.request.forms.getunicode("ime_instrumenta"),
+        portfelj
+    )
+    kolicina = int(bottle.request.forms.getunicode("kolicina"))
+    cena = instrument.cena
+    datum = date.today()
+    transakcija = Transakcija("Nakup", instrument, kolicina, cena, datum, portfelj)
+    try:
+        portfelj.opravi_transakcijo(transakcija)
+        return bottle.template(
+            "zacetna_stran.html",
+            sporocilo="Uspešno ste opravili transakcijo!",
+            portfelji=testni_model.portfelji.values(),
+            trenutni_portfelj=testni_model.trenutni_portfelj,
+        )
+    except ValueError as e:
+        return bottle.template("zacetna_stran.html",
+            sporocilo=e.args[0],
+            portfelji=testni_model.portfelji.values(),
+            trenutni_portfelj=testni_model.trenutni_portfelj,
+         )
 
 
     

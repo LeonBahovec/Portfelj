@@ -187,10 +187,11 @@ class Instrument:
         return self.cena * self.kolicina_instrumenta()
 
     def donosnost(self):
-        vlozeno = self.neto_vlozeno
-        trenutna_vrednost = self.cena * self.kolicina_instrumenta
-        rezultat = round(((vlozeno / trenutna_vrednost) - 1) * 100)
+        vlozeno = self.neto_vlozeno()
+        trenutna_vrednost = self.cena * self.kolicina_instrumenta()
+        rezultat = round(((trenutna_vrednost / vlozeno) - 1) * 100, 2)
         return f"{rezultat} %"
+    
 
 
 class Transakcija:
@@ -217,7 +218,7 @@ class Transakcija:
             "datum": date.isoformat(self.datum),
             "portfelj": self.portfelj,
         }
-    
+
     
 
 

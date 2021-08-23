@@ -1,0 +1,32 @@
+% rebase("base.html")
+
+<div>
+    <form action="/opravi-nakup/" method="POST">        
+        % 
+        <label for="izberi_portfelj">Izberi portfelj:</label>
+        <select name="izberi_portfelj" id="izberi_portfelj">
+            <option value="a" selected disabled hidden>izberi portfelj</option>
+            %for portfelj in portfelji:
+            <option value="{{ portfelj.ime_portfelja }}">{{ portfelj.ime_portfelja }}</option>
+            %end
+        </select>
+        <br>
+        <br>
+        <label for="kratica">Vnesi kratico instrumenta:</label>
+        <input type="text" name="kratica" placeholder="Kratica">
+        <br>
+        <br>
+        <label for="ime_instrumenta">Vnesi ime instrumenta:</label>
+        <input type="text" name="ime_instrumenta" placeholder="Ime instrumenta">
+        <br>
+        <br>
+        <label for="kolicina">Kolicina:</label>
+        <input type="number" name="kolicina" placeholder="Kolicina">
+        <br>
+        <br>
+        <input type="submit" value="KUPI INSTRUMENT">
+
+    </form>
+
+
+</div>
