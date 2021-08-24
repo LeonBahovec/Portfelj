@@ -3,6 +3,7 @@ from model import Model, Portfelj, Transakcija, Instrument
 from datetime import date
 
 DATOTEKA_S_STANJEM = "stanje.json"
+#DATOTEKA_S_STANJEM = "prazno.json"
 
 try:
     testni_model = Model.preberi_iz_datoteke(DATOTEKA_S_STANJEM)
@@ -50,12 +51,13 @@ def opravi_nakup():
         bottle.request.forms.getunicode("ime_instrumenta"),
         portfelj
     )
-    kolicina = int(bottle.request.forms.getunicode("kolicina"))
+    kolicina = float(bottle.request.forms.getunicode("kolicina"))
     cena = instrument.cena
     datum = date.today()
     transakcija = Transakcija("Nakup", instrument, kolicina, cena, datum, portfelj)
     try:
         portfelj.opravi_transakcijo(transakcija)
+        testni_model.shrani_datoteko(DATOTEKA_S_STANJEM)
         return bottle.template(
             "zacetna_stran.html",
             sporocilo="Uspešno ste opravili transakcijo!",
@@ -68,6 +70,39 @@ def opravi_nakup():
             portfelji=testni_model.portfelji.values(),
             trenutni_portfelj=testni_model.trenutni_portfelj,
          )
+
+@bottle.post("/opravi-prodajo/")
+def opravi_prodajo():
+    portfelj = testni_model.trenutni_portfelj
+    instrument = portfelj.instrumenti[
+        bottle.request.forms.getunicode("kratica")
+            
+    ]
+    kolicina = float(bottle.request.forms.getunicode("kolicina"))
+    cena = instrument.cena
+    datum = date.today()
+    transakcija = Transakcija("Prodaja", instrument, kolicina, cena, datum, portfelj)
+    try:
+        portfelj.opravi_transakcijo(transakcija)
+        testni_model.shrani_datoteko(DATOTEKA_S_STANJEM)
+        return bottle.template(
+            "zacetna_stran.html",
+            sporocilo="Uspešno ste opravili transakcijo",
+            portfelji=testni_model.portfelji.values(),
+            trenutni_portfelj=testni_model.trenutni_portfelj
+        )
+    except ValueError as e:
+        return bottle.template(
+            "zacetna_stran.html",
+            sporocilo=e.args[0],
+            portfelji=testni_model.portfelji,
+            trenutni_portfelj=testni_model.trenutni_portfelj
+        )
+
+
+
+
+
 
 
     

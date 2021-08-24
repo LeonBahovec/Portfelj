@@ -71,6 +71,7 @@
                 <th>Trzna vrednost</th>
                 <th>Vlozeno</th>
                 <th>Donos</th>
+                <th>Prodaja</th>
             </tr>
         </thead>
         <tbody>
@@ -83,6 +84,12 @@
                 <td>{{ round(instrument.cena * instrument.kolicina_instrumenta(), 2) }}</td>
                 <td>{{ round(instrument.neto_vlozeno(), 2) }}</td>
                 <td>{{ instrument.donosnost() }}</td>
+                <td><form action="/opravi-prodajo/" method="POST">
+                    <input type="text" name="kratica" value="{{ instrument.kratica }}" hidden>
+                    <input type="number" name="kolicina" placeholder="kolicina za prodajo">
+                    <input type="submit" value="prodaj">
+                </form>
+                </td>
             </tr>
             %end
         </tbody>
