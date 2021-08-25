@@ -1,16 +1,61 @@
 <html>
+
 <head>
     <title>Portfelj</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
 </head>
+
+
 <body>
-    <div>
-        <h1>PORTFELJ</h1>
-        <hr>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="http://127.0.0.1:8080/">
+      <img src="https://i.ibb.co/SsFhsPP/175443117-475350237063816-7357474958921672495-n.jpg" style="max-height: 100;" width="100">
+    </a>
+
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="navbarBasicExample" class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item">
+        Osnovna stran
+      </a>
+
+      <a class="navbar-item">
+        Transakcije
+      </a>
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Portfelji
+        </a>
+        <div class="navbar-dropdown">
+            %for portfelj in portfelji:
+            <a class="navbar-item" href="http://127.0.0.1:8080/portfelj/{{ portfelj.ime_portfelja }}">{{ portfelj.ime_portfelja  }}</a>
+            %end
+            <a class="navbar-item"href=""></a>
+
+        </div>
+      </div>
     </div>
 
-    {{!base}}
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons">
+          <a class="button is-primary">
+            <strong>Prijava</strong>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
 
+{{!base}}
 </body>
 
 

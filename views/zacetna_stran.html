@@ -8,6 +8,7 @@
 
 
 
+<!--
 <div>
     <p>Vaši portfelji:</p>
     <ul>
@@ -21,10 +22,11 @@
     <p>Trenutno imate za aktivni portfelj nastavljen {{ trenutni_portfelj.ime_portfelja }}</p>
     %end
 </div>
-
+-->
 
 <hr>
 
+<!--
 <div>
     <p>Nov portfelj</p>
     <form action="/dodaj-portfelj/" method="POST">
@@ -37,9 +39,11 @@
         <input type="submit" value="Dodaj portfelj">
     </form>
 </div>
+-->
+<!--<hr>-->
 
-<hr>
 
+<!--
 <div>
     <p>Zamenjaj aktivni portfelj</p>
     <form action="/zamenjaj-portfelj/" method="POST">
@@ -52,53 +56,85 @@
         <input type="submit" value="Zamenjaj portfelj">       
     </form>
        
+</div>-->
+<div class="columns is-mobile">
+    <div class="column is-2 is-offset-1">
+        %include("obrazec_za_nakup.html")
+    </div>
+
+
+
+    <div class="column is-7 is-offset-1">
+        %if trenutni_portfelj == 0:
+                <article class="message is-warning">
+                    <div class="message-header">
+                      <p>Pozor</p>
+                    </div>
+                    <div class="message-body">
+                      Trenutno nimate izbranega aktivnega portfelja.
+                      Prosimo izberite ga pod zavihkom <em>Portfelji</em>
+                    </div>
+                  </article>   
+            </div>  
+        </div>
+        %elif trenutni_portfelj.instrumenti == {}: 
+                <article class="message is-warning">
+                    <div class="message-header">
+                      <p>Pozor</p>
+                    </div>
+                    <div class="message-body">
+                      Trenutno v portfelju <em>{{ trenutni_portfelj.ime_portfelja }}</em> nimate finančnih inštrumentov.
+                      Dodate jih lahko na levi strani.
+                    </div>
+                  </article>   
+            </div>  
+        </div>   
+        %else:    
+        <p>V portfelju {{ trenutni_portfelj.ime_portfelja }} imate sledeče instrumente:</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Kratica</th>
+                    <th>Ime</th>
+                    <th>Kolicina</th>
+                    <th>Cena enote</th>
+                    <th>Trzna vrednost</th>
+                    <th>Vlozeno</th>
+                    <th>Donos</th>
+                    <th>Prodaja</th>
+                </tr>
+            </thead>
+            <tbody>
+                %for instrument in trenutni_portfelj.instrumenti.values():
+                <tr>
+                    <td>{{ instrument.kratica }}</td>
+                    <td>{{ instrument.ime }}</td>
+                    <td>{{ instrument.kolicina_instrumenta() }}</td>
+                    <td>{{ round(instrument.cena, 2) }}</td>
+                    <td>{{ round(instrument.cena * instrument.kolicina_instrumenta(), 2) }}</td>
+                    <td>{{ round(instrument.neto_vlozeno(), 2) }}</td>
+                    <td>{{ instrument.donosnost() }}</td>
+                    <td><form action="/opravi-prodajo/" method="POST">
+                        <input type="text" name="kratica" value="{{ instrument.kratica }}" hidden>
+                        <input type="number" name="kolicina" placeholder="kolicina za prodajo">
+                        <button type="submit" value="prodaj">
+                    </form>
+                    </td>
+                </tr>
+                %end
+            </tbody>
+        </table>
+        %end
+    </div>
 </div>
 
-<div>
-    %if trenutni_portfelj == 0:
-    <p>IZBERITE AKTIVNI PORTFELJ</p>
-    %elif trenutni_portfelj.instrumenti == {}:
-    <p>TRENUTNO V PORTFELJU {{ trenutni_portfelj.ime_portfelja }} ŠE NIMATE NOBENIH INSTRUMENTOV</p>
-    %else:    
-    <p>V portfelju {{ trenutni_portfelj.ime_portfelja }} imate sledeče instrumente:</p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Kratica</th>
-                <th>Ime</th>
-                <th>Kolicina</th>
-                <th>Cena enote</th>
-                <th>Trzna vrednost</th>
-                <th>Vlozeno</th>
-                <th>Donos</th>
-                <th>Prodaja</th>
-            </tr>
-        </thead>
-        <tbody>
-            %for instrument in trenutni_portfelj.instrumenti.values():
-            <tr>
-                <td>{{ instrument.kratica }}</td>
-                <td>{{ instrument.ime }}</td>
-                <td>{{ instrument.kolicina_instrumenta() }}</td>
-                <td>{{ round(instrument.cena, 2) }}</td>
-                <td>{{ round(instrument.cena * instrument.kolicina_instrumenta(), 2) }}</td>
-                <td>{{ round(instrument.neto_vlozeno(), 2) }}</td>
-                <td>{{ instrument.donosnost() }}</td>
-                <td><form action="/opravi-prodajo/" method="POST">
-                    <input type="text" name="kratica" value="{{ instrument.kratica }}" hidden>
-                    <input type="number" name="kolicina" placeholder="kolicina za prodajo">
-                    <input type="submit" value="prodaj">
-                </form>
-                </td>
-            </tr>
-            %end
-        </tbody>
-    </table>
-    <br>
-    <hr>
-    %end
-
+<!--
     <form action="/obrazec-za-nakup/">
         <input type="SUBMIT" value="KUPI INSTRUMENT">
     </form>
+-->
+ 
+
+<!--
 </div>
+-->

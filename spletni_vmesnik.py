@@ -1,24 +1,41 @@
+from typing import Type
 import bottle
 from model import Model, Portfelj, Transakcija, Instrument
 from datetime import date
 
-DATOTEKA_S_STANJEM = "stanje.json"
-#DATOTEKA_S_STANJEM = "prazno.json"
+#DATOTEKA_S_STANJEM = "stanje.json"
+DATOTEKA_S_STANJEM = "prazno.json"
 
-try:
-    testni_model = Model.preberi_iz_datoteke(DATOTEKA_S_STANJEM)
-except FileNotFoundError:
-    testni_model = Model()
-
+#try:
+#    testni_model = Model.preberi_iz_datoteke(DATOTEKA_S_STANJEM)
+#except FileNotFoundError:
+#    testni_model = Model()
+testni_model = Model()
 
 @bottle.get("/")
 def osnovna_stran():
+    if testni_model.trenutni_portfelj != 0:
+        bottle.redirect("/portfelj/" + testni_model.trenutni_portfelj.ime_portfelja)
+    else:
+        if testni_model.portfelji != {}:
+            nakljucno_ime_portfelja = list(testni_model.portfelji.keys())[0]
+            bottle.redirect("portfelj/" + nakljucno_ime_portfelja)
+        else:
+            return bottle.template(
+                "brez_portfeljev.html",
+                portfelji=testni_model.portfelji.values(),
+                trenutni_portfelj=testni_model.trenutni_portfelj
+            )
+
+@bottle.get("/portfelj/<portfelj>")
+def osnovna_stran_portfelja(portfelj):
+    testni_model.trenutni_portfelj = testni_model.portfelji[portfelj]
     return bottle.template(
         "zacetna_stran.html",
         sporocilo=None, 
         portfelji=testni_model.portfelji.values(),
         trenutni_portfelj=testni_model.trenutni_portfelj
-    )
+    ) 
 
 @bottle.post("/dodaj-portfelj/")
 def dodaj_portfelj():
@@ -41,16 +58,25 @@ def zamenjaj_portfelj():
 def obrazec_za_nakup():
     return bottle.template(
         "obrazec_za_nakup.html",
+        sporocilo=None,
         portfelji=testni_model.portfelji.values())
 
 @bottle.post("/opravi-nakup/")
 def opravi_nakup():
     portfelj = testni_model.portfelji[bottle.request.forms.getunicode("izberi_portfelj")]
-    instrument = Instrument(
+    try:
+        instrument = Instrument(
         bottle.request.forms.getunicode("kratica"),
         bottle.request.forms.getunicode("ime_instrumenta"),
         portfelj
     )
+    except TypeError:
+        return bottle.template(
+            "obrazec_za_nakup.html",
+            sporocilo="Kratica, ki ste jo vnesli ne obstaja",
+            portfelji=testni_model.portfelji.values(),
+        )
+
     kolicina = float(bottle.request.forms.getunicode("kolicina"))
     cena = instrument.cena
     datum = date.today()

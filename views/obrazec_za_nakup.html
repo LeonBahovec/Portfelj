@@ -1,11 +1,42 @@
-% rebase("base.html")
 
+
+%if sporocilo is not None:
+<p>{{ sporocilo }}</p>
+%end
+
+<form action="/opravi-nakup/" method="POST">
+    <div class="field" id="opravi-nakup">
+        <label class="label">Kratica instrumenta</label>
+        <div class="control">
+            <input type="text" name="izberi_portfelj" value="{{ trenutni_portfelj.ime_portfelja }}" hidden>
+            <input class="input" type="text" name="kratica" placeholder="Vnesite kratico instrumenta, npr. AAPL" required>
+        </div>
+    </div>   
+    <div class="field">
+        <label class="label">Ime instrumenta</label>
+        <div class="control">
+            <input class="input" type="text" name="ime_instrumenta" placeholder="Vnesite ime instrumenta, npr. Apple" required  >
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Količina</label>
+        <div class="control">
+            <input class="input" type="text" name="kolicina" placeholder="Koliko enot želite kupiti?" required  >
+        </div>
+    </div>
+    <div class="control">
+        <button type="submit" class="button is-primary">Kupi instrument</button>
+    </div>
+</form>
+
+
+<!--
 <div>
     <form action="/opravi-nakup/" method="POST">        
         % 
         <label for="izberi_portfelj">Izberi portfelj:</label>
-        <select name="izberi_portfelj" id="izberi_portfelj">
-            <option value="a" selected disabled hidden>izberi portfelj</option>
+        <select name="izberi_portfelj" id="izberi_portfelj" required>
+            <option value="" selected disabled hidden>izberi portfelj</option>
             %for portfelj in portfelji:
             <option value="{{ portfelj.ime_portfelja }}">{{ portfelj.ime_portfelja }}</option>
             %end
@@ -13,20 +44,19 @@
         <br>
         <br>
         <label for="kratica">Vnesi kratico instrumenta:</label>
-        <input type="text" name="kratica" placeholder="Kratica">
+        <input type="text" name="kratica" placeholder="Kratica" required>
         <br>
         <br>
         <label for="ime_instrumenta">Vnesi ime instrumenta:</label>
-        <input type="text" name="ime_instrumenta" placeholder="Ime instrumenta">
+        <input type="text" name="ime_instrumenta" placeholder="Ime instrumenta" required>
         <br>
         <br>
         <label for="kolicina">Kolicina:</label>
-        <input type="number" name="kolicina" placeholder="Kolicina">
+        <input type="number" name="kolicina" placeholder="Kolicina" required>
         <br>
         <br>
-        <input type="submit" value="KUPI INSTRUMENT">
+        <button type="submit" value="KUPI INSTRUMENT">Kupi instrument</button>
 
-    </form>
-
-
+    </form>     
 </div>
+-->

@@ -1,0 +1,37 @@
+% rebase("base.html")
+
+<div class="columns is-mobile">
+    <div class="column is-4 is-offset-4">  
+        <article class="message is-info">
+            <div class="message-header">
+              <p>Pozdravljeni!</p>
+            </div>
+            <div class="message-body">
+              Trenutno nimate odprtega nobenega portfelja.
+              Prosimo dodajte nov portfelj.
+            </div>
+          </article>   
+    </div>  
+</div>
+
+<div class="columns is-mobile">
+    <div class="column is-4 is-offset-4">
+        <form action="/dodaj-portfelj/" method="POST">
+            <div class="field" id="dodaj-portfelj">
+                <label class="label">Ime portfelja</label>
+                <div class="control">
+                    <input class="input" type="text" name="ime_portfelja" placeholder="Vnesi ime portfelja" required>
+                </div>
+            </div>   
+            <div class="field">
+                <label class="label">Valuta</label>
+                <div class="control">
+                    <input class="input" type="text" name="valuta" placeholder="Vnesi 3-mestno kratico valute; npr. EUR, USD,..." required  >
+                </div>
+            </div>
+            <div class="control">
+                <button type="submit" class="button is-primary">Dodaj portfelj</button>
+            </div>
+        </form>
+    </div>
+</div>
