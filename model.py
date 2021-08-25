@@ -112,7 +112,7 @@ class Portfelj:
     
     def vrednost_portfelja(self):
         vrednost_instrumentov = 0
-        for instrument in self.instrumenti:
+        for instrument in self.instrumenti.values():
             vrednost_instrumentov += instrument.trenutna_vrednost_instrumenta()
         return vrednost_instrumentov + self.kolicina_valute
 

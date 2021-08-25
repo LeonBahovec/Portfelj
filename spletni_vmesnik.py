@@ -37,6 +37,24 @@ def osnovna_stran_portfelja(portfelj):
         trenutni_portfelj=testni_model.trenutni_portfelj
     ) 
 
+@bottle.get("/prijava/")
+def prijava():
+    return bottle.template(
+        "prijava.html",
+        sporocilo=None,
+        portfelji=testni_model.portfelji.values(),
+        trenutni_portfelj=testni_model.trenutni_portfelj
+    )
+
+
+@bottle.get("/obrazec-za-dodajanje-portfelja/")
+def obrazec_za_dodajanje_portfelja():
+    return bottle.template(
+        "obrazec_za_dodajanje_portfelja.html",
+        portfelji=testni_model.portfelji.values(),
+        trenutni_portfelj=testni_model.trenutni_portfelj
+        )
+
 @bottle.post("/dodaj-portfelj/")
 def dodaj_portfelj():
     novi_portfelj = Portfelj(

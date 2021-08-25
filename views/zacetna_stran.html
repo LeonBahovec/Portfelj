@@ -1,12 +1,6 @@
 % rebase("base.html")
 
-%if sporocilo != None:
-<p> {{ sporocilo }}</p>
-%end
-
-
-
-
+<hr>
 
 <!--
 <div>
@@ -23,8 +17,6 @@
     %end
 </div>
 -->
-
-<hr>
 
 <!--
 <div>
@@ -58,13 +50,20 @@
        
 </div>-->
 <div class="columns is-mobile">
-    <div class="column is-2 is-offset-1">
+    <div class="column is-3 is-offset-1">
+        <div class="box">
+            <h1><strong>Portfelj: </strong><em>{{ trenutni_portfelj.ime_portfelja }}</em></h1>
+            <h1><strong>Razpoložljiva sredstva:</strong> {{ trenutni_portfelj.kolicina_valute }} {{ trenutni_portfelj.valuta }}</h1>
+            <h1><strong>Vrednost finančnih inštrumentov: </strong>{{ trenutni_portfelj.vrednost_portfelja() - trenutni_portfelj.kolicina_valute }} {{ trenutni_portfelj.valuta }} </h1>
+            <h1><strong>Skupna vrednost portfelja: </strong> {{ trenutni_portfelj.vrednost_portfelja() }} {{ trenutni_portfelj.valuta }}</h1>
+        </div>
+
         %include("obrazec_za_nakup.html")
     </div>
 
 
 
-    <div class="column is-7 is-offset-1">
+    <div class="column is-5 is-offset-1">
         %if trenutni_portfelj == 0:
                 <article class="message is-warning">
                     <div class="message-header">
@@ -74,9 +73,8 @@
                       Trenutno nimate izbranega aktivnega portfelja.
                       Prosimo izberite ga pod zavihkom <em>Portfelji</em>
                     </div>
-                  </article>   
-            </div>  
-        </div>
+                  </article>
+            </div>     
         %elif trenutni_portfelj.instrumenti == {}: 
                 <article class="message is-warning">
                     <div class="message-header">
@@ -87,21 +85,21 @@
                       Dodate jih lahko na levi strani.
                     </div>
                   </article>   
-            </div>  
-        </div>   
+            </div>    
         %else:    
         <p>V portfelju {{ trenutni_portfelj.ime_portfelja }} imate sledeče instrumente:</p>
         <table class="table">
             <thead>
                 <tr>
                     <th>Kratica</th>
-                    <th>Ime</th>
-                    <th>Kolicina</th>
+                    <th>Ime inšrtumenta</th>
+                    <th>Količina</th>
                     <th>Cena enote</th>
-                    <th>Trzna vrednost</th>
-                    <th>Vlozeno</th>
+                    <th>Tržna vrednost</th>
+                    <th>Vloženo</th>
                     <th>Donos</th>
-                    <th>Prodaja</th>
+                    <th>Prodaja inštrumenta</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -114,11 +112,20 @@
                     <td>{{ round(instrument.cena * instrument.kolicina_instrumenta(), 2) }}</td>
                     <td>{{ round(instrument.neto_vlozeno(), 2) }}</td>
                     <td>{{ instrument.donosnost() }}</td>
-                    <td><form action="/opravi-prodajo/" method="POST">
-                        <input type="text" name="kratica" value="{{ instrument.kratica }}" hidden>
-                        <input type="number" name="kolicina" placeholder="kolicina za prodajo">
-                        <button type="submit" value="prodaj">
-                    </form>
+                    <td>
+                        <form action="/opravi-prodajo/" method="POST">
+                        <div class="field"> 
+                            <div class="control">
+                                <input type="text" name="kratica" value="{{ instrument.kratica }}" hidden>
+                                <input class="input" type="number" name="kolicina" placeholder="količina" required>
+                            </div>
+                        </div>
+                    </td>
+
+                        
+                    <td>    
+                            <button class="button is-primary" type="submit" value="prodaj">PRODAJ</button>
+                        </form>
                     </td>
                 </tr>
                 %end
@@ -128,13 +135,3 @@
     </div>
 </div>
 
-<!--
-    <form action="/obrazec-za-nakup/">
-        <input type="SUBMIT" value="KUPI INSTRUMENT">
-    </form>
--->
- 
-
-<!--
-</div>
--->
