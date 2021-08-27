@@ -90,9 +90,10 @@ def opravi_nakup():
     )
     except TypeError:
         return bottle.template(
-            "obrazec_za_nakup.html",
+            "zacetna_stran.html",
             sporocilo="Kratica, ki ste jo vnesli ne obstaja",
             portfelji=testni_model.portfelji.values(),
+            trenutni_portfelj=testni_model.trenutni_portfelj
         )
 
     kolicina = float(bottle.request.forms.getunicode("kolicina"))
@@ -109,7 +110,8 @@ def opravi_nakup():
             trenutni_portfelj=testni_model.trenutni_portfelj,
         )
     except ValueError as e:
-        return bottle.template("zacetna_stran.html",
+        return bottle.template(
+            "zacetna_stran.html",
             sporocilo=e.args[0],
             portfelji=testni_model.portfelji.values(),
             trenutni_portfelj=testni_model.trenutni_portfelj,
@@ -139,7 +141,7 @@ def opravi_prodajo():
         return bottle.template(
             "zacetna_stran.html",
             sporocilo=e.args[0],
-            portfelji=testni_model.portfelji,
+            portfelji=testni_model.portfelji.values(),
             trenutni_portfelj=testni_model.trenutni_portfelj
         )
 

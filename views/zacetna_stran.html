@@ -94,7 +94,7 @@
                     <th>Kratica</th>
                     <th>Ime inšrtumenta</th>
                     <th>Količina</th>
-                    <th>Cena enote</th>
+                    <th>Cena enote({{ trenutni_portfelj.valuta }})</th>
                     <th>Tržna vrednost</th>
                     <th>Vloženo</th>
                     <th>Donos</th>
@@ -111,7 +111,13 @@
                     <td>{{ round(instrument.cena, 2) }}</td>
                     <td>{{ round(instrument.cena * instrument.kolicina_instrumenta(), 2) }}</td>
                     <td>{{ round(instrument.neto_vlozeno(), 2) }}</td>
+                    %if float(instrument.donosnost()[:-1]) > 0: 
+                    <td class="has-text-primary">{{ instrument.donosnost() }}</td>
+                    %elif float(instrument.donosnost()[:-1]) < 0:
+                    <td class="has-text-danger">{{ instrument.donosnost() }}</td>
+                    %else:
                     <td>{{ instrument.donosnost() }}</td>
+                    %end
                     <td>
                         <form action="/opravi-prodajo/" method="POST">
                         <div class="field"> 

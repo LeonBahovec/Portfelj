@@ -108,7 +108,7 @@ class Portfelj:
                 if transakcija.instrument.kolicina_instrumenta() == 0:
                     self.pobrisi_prazen_instrument(transakcija.instrument)
             else:
-                raise ValueError("Na voljo imate premajhno kolicino finančnega inštrumenta. Poskusite s prodajo na prazno")
+                raise ValueError("Na voljo imate premajhno kolicino finančnega inštrumenta.")
     
     def vrednost_portfelja(self):
         vrednost_instrumentov = 0
