@@ -3,14 +3,14 @@ import bottle
 from model import Model, Portfelj, Transakcija, Instrument
 from datetime import date
 
-#DATOTEKA_S_STANJEM = "stanje.json"
-DATOTEKA_S_STANJEM = "prazno.json"
+DATOTEKA_S_STANJEM = "stanje.json"
 
-#try:
-#    testni_model = Model.preberi_iz_datoteke(DATOTEKA_S_STANJEM)
-#except FileNotFoundError:
-#    testni_model = Model()
-testni_model = Model()
+
+try:
+    testni_model = Model.preberi_iz_datoteke(DATOTEKA_S_STANJEM)
+except FileNotFoundError:
+    testni_model = Model()
+
 
 @bottle.get("/")
 def osnovna_stran():

@@ -1,4 +1,4 @@
-% rebase("base.html")
+%rebase("base.html")
 
 <hr>
 
@@ -53,9 +53,9 @@
     <div class="column is-3 is-offset-1">
         <div class="box">
             <h1><strong>Portfelj: </strong><em>{{ trenutni_portfelj.ime_portfelja }}</em></h1>
-            <h1><strong>Razpoložljiva sredstva:</strong> {{ trenutni_portfelj.kolicina_valute }} {{ trenutni_portfelj.valuta }}</h1>
-            <h1><strong>Vrednost finančnih inštrumentov: </strong>{{ trenutni_portfelj.vrednost_portfelja() - trenutni_portfelj.kolicina_valute }} {{ trenutni_portfelj.valuta }} </h1>
-            <h1><strong>Skupna vrednost portfelja: </strong> {{ trenutni_portfelj.vrednost_portfelja() }} {{ trenutni_portfelj.valuta }}</h1>
+            <h1><strong>Razpoložljiva sredstva:</strong> {{ round(trenutni_portfelj.kolicina_valute, 2) }} {{ trenutni_portfelj.valuta }}</h1>
+            <h1><strong>Vrednost finančnih inštrumentov: </strong>{{ round(trenutni_portfelj.vrednost_portfelja() - trenutni_portfelj.kolicina_valute, 2) }} {{ trenutni_portfelj.valuta }} </h1>
+            <h1><strong>Skupna vrednost portfelja: </strong> {{ round(trenutni_portfelj.vrednost_portfelja(), 2) }} {{ trenutni_portfelj.valuta }}</h1>
         </div>
 
         %include("obrazec_za_nakup.html")
@@ -87,7 +87,7 @@
                   </article>   
             </div>    
         %else:    
-        <p>V portfelju {{ trenutni_portfelj.ime_portfelja }} imate sledeče instrumente:</p>
+
         <table class="table">
             <thead>
                 <tr>
