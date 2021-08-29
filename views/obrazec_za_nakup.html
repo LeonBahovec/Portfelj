@@ -7,16 +7,16 @@
 
 <form action="/opravi-nakup/" method="POST">
     <div class="field" id="opravi-nakup">
-        <label class="label">Kratica instrumenta</label>
+        <label class="label">Kratica inštrumenta</label>
         <div class="control">
             <input type="text" name="izberi_portfelj" value="{{ trenutni_portfelj.ime_portfelja }}" hidden>
-            <input class="input" type="text" name="kratica" placeholder="Vnesite kratico instrumenta, npr. AAPL" required>
+            <input class="input" type="text" name="kratica" placeholder="Vnesite kratico instrumenta npr. AAPL" required>
         </div>
     </div>   
     <div class="field">
-        <label class="label">Ime instrumenta</label>
+        <label class="label">Ime inštrumenta</label>
         <div class="control">
-            <input class="input" type="text" name="ime_instrumenta" placeholder="Vnesite ime instrumenta, npr. Apple" required  >
+            <input class="input" type="text" name="ime_instrumenta" placeholder="Vnesite ime instrumenta npr. Apple" required  >
         </div>
     </div>
     <div class="field">
