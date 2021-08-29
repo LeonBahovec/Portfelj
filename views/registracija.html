@@ -44,14 +44,14 @@
               </div>
             </div>
           </div>
-        </div>
         </nav>
+
 %if napaka is not None:
 <div class="columns is-mobile">
   <div class="column is-3 is-offset-4">  
       <article class="message is-danger">
           <div class="message-header">
-            <p>Prijava neuspešna</p>
+            <p>Registracija neuspešna</p>
           </div>
           <div class="message-body">
             {{ napaka }}
@@ -60,25 +60,24 @@
   </div>  
 </div>
 %end
-
 <div class="columns is-mobile">
     <div class="column is-4 is-offset-4">
-        <form action="/prijava/" method="POST" class="box">
+        <form action="/registracija/" method="POST" class="box">
             <div class="field">
               <label class="label">Uporabniško ime</label>
               <div class="control">
-                <input class="input" type="text" name="uporabnisko_ime" placeholder="Uporabniško ime" required>
+                <input class="input" type="text" name="uporabnisko_ime" placeholder="Uporabniško ime">
               </div>
             </div>
         
             <div class="field">
               <label class="label">Geslo</label>
               <div class="control">
-                <input class="input" type="password" name="geslo" placeholder="********" required>
+                <input class="input" type="password" name="geslo" placeholder="********">
               </div>
             </div>
         
-            <button class="button is-primary">Prijavi se</button>
+            <button class="button is-primary">Registriraj se</button>
         </form>
     </div>
 </div>

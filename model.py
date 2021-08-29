@@ -1,7 +1,83 @@
+import hashlib
+import random
 from os import stat
 from yahoofinancials import YahooFinancials
 from datetime import date
 import json
+
+
+class Uporabnik:
+    def __init__(self, uporabnisko_ime, zasifrirano_geslo, model):
+        self.uporabnisko_ime = uporabnisko_ime
+        self.zasifrirano_geslo = zasifrirano_geslo
+        self.model = model	
+    
+    @staticmethod
+    def prijava(uporabnisko_ime, geslo_v_cistopisu):
+        uporabnik = Uporabnik.preberi_iz_datoteke(uporabnisko_ime)
+        if uporabnik is None:
+            raise ValueError("Uporabniško ime ne obstaja")
+        elif uporabnik.preveri_geslo(geslo_v_cistopisu):
+            return uporabnik
+        else:
+            raise ValueError("Geslo je napačno")
+    
+    @staticmethod
+    def registracija(uporabnisko_ime, geslo_v_cistopisu):
+        if Uporabnik.preberi_iz_datoteke(uporabnisko_ime) is not None:
+            raise ValueError("Uporabniško ime že obstaja")
+        else:
+            zasifrirano_geslo = Uporabnik.zasifriraj_geslo(geslo_v_cistopisu)
+            uporabnik = Uporabnik(uporabnisko_ime, zasifrirano_geslo, Model())
+            uporabnik.shrani_datoteko()
+            return uporabnik
+
+    @staticmethod
+    def zasifriraj_geslo(geslo_v_cistopisu, sol=None):
+        if sol is None:
+            sol = str(random.getrandbits(32))
+        posojeno_geslo = sol + geslo_v_cistopisu
+        h = hashlib.blake2b()
+        h.update(posojeno_geslo.encode(encoding="utf-8"))
+        return f"{sol}${h.hexdigest()}"
+    
+    
+    def v_slovar(self):
+        return {
+            "uporabnisko_ime": self.uporabnisko_ime,
+            "zasifrirano_geslo": self.zasifrirano_geslo,
+            "model": self.model.v_slovar(),
+        }
+    
+    @staticmethod
+    def ime_uporabnikove_datoteke(uporabnisko_ime):
+        return f"{uporabnisko_ime}.json"
+
+
+    def shrani_datoteko(self):
+        with open(Uporabnik.ime_uporabnikove_datoteke(self.uporabnisko_ime), "w", encoding="utf-8") as datoteka:
+            json.dump(self.v_slovar(), datoteka, ensure_ascii=False, indent=4)
+
+    def preveri_geslo(self, geslo_v_cistopisu):
+        sol, _ = self.zasifrirano_geslo.split("$")
+        return self.zasifrirano_geslo == Uporabnik.zasifriraj_geslo(geslo_v_cistopisu, sol)
+
+    @staticmethod
+    def iz_slovarja(slovar):
+        uporabnisko_ime = slovar["uporabnisko_ime"]
+        zasifrirano_geslo = slovar["zasifrirano_geslo"]
+        model = Model.iz_slovarja(slovar["model"])
+        return Uporabnik(uporabnisko_ime, zasifrirano_geslo, model)
+    
+    @staticmethod
+    def preberi_iz_datoteke(uporabnisko_ime):
+        try:
+            with open(Uporabnik.ime_uporabnikove_datoteke(uporabnisko_ime), "r", encoding="utf-8") as datoteka:
+                slovar = json.load(datoteka)
+                return Uporabnik.iz_slovarja(slovar)
+        except FileNotFoundError:
+            return None
+
 
 
 
@@ -18,9 +94,16 @@ class Model:
         del self.portfelji[portfelj.ime_portfelja]
     
     def v_slovar(self):
-        return {
-            "portfelji":[portfelj.v_slovar() for portfelj in self.portfelji.values()]
-        }
+        if self.trenutni_portfelj == 0:
+            return {
+                "portfelji":[portfelj.v_slovar() for portfelj in self.portfelji.values()],
+                "trenutni_portfelj": 0
+            }
+        else:
+            return {
+                "portfelji":[portfelj.v_slovar() for portfelj in self.portfelji.values()],
+                "trenutni_portfelj": self.trenutni_portfelj.ime_portfelja
+            }
     
     @staticmethod
     def iz_slovarja(slovar):
@@ -42,6 +125,10 @@ class Model:
             for instrument_kot_slovar in portfelj_kot_slovar["instrumenti"]:
                 instrument = Instrument(instrument_kot_slovar["kratica"], instrument_kot_slovar["ime"], portfelj)
                 portfelj.dodaj_instrument(instrument)
+        if slovar["trenutni_portfelj"] == 0:
+            krovni_model.trenutni_portfelj = 0
+        else:
+            krovni_model.trenutni_portfelj = krovni_model.portfelji[slovar["trenutni_portfelj"]]
         return krovni_model
 
     def shrani_datoteko(self, ime_datoteke):

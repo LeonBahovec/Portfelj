@@ -46,10 +46,11 @@
     <div class="navbar-end">
       <div class="navbar-item">
         <div class="buttons">
-          <a href="http://127.0.0.1:8080/prijava/" class="button is-primary">
-            <strong>Prijava</strong>
-          </a>
+          <form action="/" method="GET"><button class="button is-primary"  type="submit">Uporabnik: {{ user.uporabnisko_ime }}</button></form>        
         </div>
+      </div>
+      <div class="buttons">
+        <form action="/odjava/" method="POST"><button class="button is-danger"  type="submit">Odjava</button></form>        
       </div>
     </div>
   </div>
