@@ -3,8 +3,7 @@
 ## Delovanje programa
 
 S programom lahko uporabnik virtualno trguje s finančnimi inštrumenti. 
-Uporabnik lahko ustvari poljubno mnogo portfeljev. Pri ustvarjanju portfelja uporabnik izbere v kateri valuti želi spremljati gibanje cen. Ko je portfelj ustvarjen uporabnik dobi 100.000 enot valute, ki jih prosto lahko uporabi za nakupe finančnih instrumentov. Program nato spremlja premike
-cen in temu primerno prikazuje vrednost uporabnikovega portfelja. 
+Uporabnik lahko ustvari poljubno mnogo portfeljev. Pri ustvarjanju portfelja uporabnik izbere v kateri valuti želi spremljati gibanje cen. Ko je portfelj ustvarjen uporabnik dobi 100.000 enot valute, ki jih prosto lahko uporabi za nakupe finančnih instrumentov. Program nato spremlja premike cen ter prikazuje vrednost in donosnost portfelja. 
 
 Program omogoča trgovanje z inštrumenti, ki so na voljo na platformi [Yahoo Finance](https://finance.yahoo.com/).
 Pri nakupu inštrumenta je potrebno vnesti njegovo borzno kratico. Slednja se nahaja na osnovni strani posameznega inštrumenta v oklepaju poleg imena inštrumenta. Applova kratica je tako na primer [AAPL](https://finance.yahoo.com/quote/AAPL/).
