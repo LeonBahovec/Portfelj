@@ -18,4 +18,6 @@ Za delovanje programa je potrebno naložiti knjižnico **YahooFinancials**.
 Program se požene prek datoteke **spletni_vmesnik.py**
 
 ## Opomba
-Knjižnjica YahooFinancials, ki skrbi za podatke o finančnih inštrumentih pobira podatke izredno počasi (Vsak klic funkcije iz te knjižnice traja vsaj nekaj sekund), zato tudi sam program deluje zelo počasi. Sploh počasna je spletna storitev za več uporabnikov. Vsakič ko prijavljen uporabnik naloži novo stran, namreč na novo preberemo podatke iz uporabnikove datoteke in ob tem uporabimo YahooFinancials precejkrat, zato nalaganje strani lahko traja tudi po nekaj minut. 
+Knjižnjica YahooFinancials, ki skrbi za podatke o finančnih inštrumentih pobira podatke izredno počasi (Vsak klic funkcije iz te knjižnice traja vsaj nekaj sekund), zato tudi sam program deluje počasi. Sploh počasna je spletna storitev za več uporabnikov. Vsakič ko prijavljen uporabnik naloži novo stran, namreč na novo preberemo podatke iz uporabnikove datoteke in ob tem uporabimo YahooFinancials precejkrat, zato nalaganje strani lahko traja tudi po nekaj minut.
+
+Različica za enega uporabnika ([git commit iz 27. avgusta "Popravil opozorila za napacne vnose"](https://github.com/LeonBahovec/Portfelj/tree/5be1c7494ea23cb43f9bd85681449224b2424692)) je zato načeloma prijaznejša za uporabo, saj iz datoteke podatke nalaga le ob ponovnem zagonu programa.
