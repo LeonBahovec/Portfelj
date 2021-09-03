@@ -1,6 +1,7 @@
 import hashlib
 import random
 from os import stat
+from re import A
 from yahoofinancials import YahooFinancials
 from datetime import date
 import json
@@ -112,19 +113,33 @@ class Model:
             portfelj = Portfelj(portfelj_kot_slovar["ime_portfelja"], portfelj_kot_slovar["valuta"])
             portfelj.kolicina_valute = portfelj_kot_slovar["kolicina_valute"]
             krovni_model.dodaj_portfelj(portfelj)
+            for instrument_kot_slovar in portfelj_kot_slovar["instrumenti"]:
+                instrument = Instrument(instrument_kot_slovar["kratica"], instrument_kot_slovar["ime"], portfelj, instrument_kot_slovar["valuta"])
+                portfelj.dodaj_instrument(instrument)
             for transakcija_kot_slovar in portfelj_kot_slovar["transakcije"]:
                 transakcija = Transakcija(
                     transakcija_kot_slovar["poteza"], 
-                    Instrument(transakcija_kot_slovar["instrument"]["kratica"], transakcija_kot_slovar["instrument"]["ime"], portfelj), 
+                    portfelj.instrumenti[transakcija_kot_slovar["instrument"]], 
                     transakcija_kot_slovar["kolicina"], 
                     transakcija_kot_slovar["cena"], 
                     date.fromisoformat(transakcija_kot_slovar["datum"]), 
                     portfelj
-                    )
+                )       
                 portfelj.dodaj_transakcijo(transakcija)
-            for instrument_kot_slovar in portfelj_kot_slovar["instrumenti"]:
-                instrument = Instrument(instrument_kot_slovar["kratica"], instrument_kot_slovar["ime"], portfelj)
-                portfelj.dodaj_instrument(instrument)
+            
+            #for transakcija_kot_slovar in portfelj_kot_slovar["transakcije"]:
+            #    transakcija = Transakcija(
+            #        transakcija_kot_slovar["poteza"], 
+            #        Instrument(transakcija_kot_slovar["instrument"]["kratica"], transakcija_kot_slovar["instrument"]["ime"], portfelj), 
+            #        transakcija_kot_slovar["kolicina"], 
+            #        transakcija_kot_slovar["cena"], 
+            #        date.fromisoformat(transakcija_kot_slovar["datum"]), 
+            #        portfelj
+            #        )
+            #    portfelj.dodaj_transakcijo(transakcija)
+            #for instrument_kot_slovar in portfelj_kot_slovar["instrumenti"]:
+            #    instrument = Instrument(instrument_kot_slovar["kratica"], instrument_kot_slovar["ime"], portfelj)
+            #    portfelj.dodaj_instrument(instrument)
         if slovar["trenutni_portfelj"] == 0:
             krovni_model.trenutni_portfelj = 0
         else:
@@ -215,10 +230,7 @@ class Portfelj:
             "transakcije": [
                 {
                     "poteza": transakcija.poteza,
-                    "instrument": {
-                        "kratica": transakcija.instrument.kratica,
-                        "ime": transakcija.instrument.ime,
-                    },
+                    "instrument": transakcija.instrument.kratica,
                     "kolicina":transakcija.kolicina,
                     "cena": transakcija.cena,
                     "datum": date.isoformat(transakcija.datum),
@@ -228,22 +240,26 @@ class Portfelj:
             "instrumenti": [
                 {
                     "kratica": instrument.kratica,
-                    "ime": instrument.ime
+                    "ime": instrument.ime,
+                    "valuta" : instrument.valuta
                 }
                 for instrument in self.instrumenti.values()
             ]
         }
 
 class Instrument:
-    def __init__(self, kratica, ime, portfelj):
+    def __init__(self, kratica, ime, portfelj, valuta=None):
         self.kratica = kratica
         self.portfelj = portfelj
         self.ime = ime
-        valuta_instrumenta = YahooFinancials(self.kratica).get_currency()
-        if valuta_instrumenta == portfelj.valuta:
+        if valuta == None:
+            self.valuta = YahooFinancials(self.kratica).get_currency()
+        else:
+            self.valuta = valuta
+        if self.valuta == portfelj.valuta:
             self.cena = YahooFinancials(self.kratica).get_current_price()
         else:
-            self.cena = YahooFinancials(self.kratica).get_current_price() / YahooFinancials((portfelj.valuta + valuta_instrumenta + "=X")).get_current_price()
+            self.cena = YahooFinancials(self.kratica).get_current_price() / YahooFinancials((portfelj.valuta + self.valuta + "=X")).get_current_price()
         
 
     def __repr__(self):
