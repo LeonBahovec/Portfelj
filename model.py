@@ -122,7 +122,7 @@ class Model:
                         instrument_kot_slovar["kratica"],
                         instrument_kot_slovar["ime"],
                         portfelj,
-                        instrument_kot_slovar["kratica"],
+                        instrument_kot_slovar["valuta"],
                         cena
                     )
                     portfelj.dodaj_instrument(instrument)
@@ -147,20 +147,6 @@ class Model:
                     portfelj
                 )       
                 portfelj.dodaj_transakcijo(transakcija)
-            
-            #for transakcija_kot_slovar in portfelj_kot_slovar["transakcije"]:
-            #    transakcija = Transakcija(
-            #        transakcija_kot_slovar["poteza"], 
-            #        Instrument(transakcija_kot_slovar["instrument"]["kratica"], transakcija_kot_slovar["instrument"]["ime"], portfelj), 
-            #        transakcija_kot_slovar["kolicina"], 
-            #        transakcija_kot_slovar["cena"], 
-            #        date.fromisoformat(transakcija_kot_slovar["datum"]), 
-            #        portfelj
-            #        )
-            #    portfelj.dodaj_transakcijo(transakcija)
-            #for instrument_kot_slovar in portfelj_kot_slovar["instrumenti"]:
-            #    instrument = Instrument(instrument_kot_slovar["kratica"], instrument_kot_slovar["ime"], portfelj)
-            #    portfelj.dodaj_instrument(instrument)
         if slovar["trenutni_portfelj"] == 0:
             krovni_model.trenutni_portfelj = 0
         else:
