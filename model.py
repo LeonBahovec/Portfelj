@@ -113,9 +113,30 @@ class Model:
             portfelj = Portfelj(portfelj_kot_slovar["ime_portfelja"], portfelj_kot_slovar["valuta"])
             portfelj.kolicina_valute = portfelj_kot_slovar["kolicina_valute"]
             krovni_model.dodaj_portfelj(portfelj)
+            seznam_kratic = [instrument["kratica"] for instrument in portfelj_kot_slovar["instrumenti"]]
+            slovar_cen = YahooFinancials(seznam_kratic).get_current_price()
             for instrument_kot_slovar in portfelj_kot_slovar["instrumenti"]:
-                instrument = Instrument(instrument_kot_slovar["kratica"], instrument_kot_slovar["ime"], portfelj, instrument_kot_slovar["valuta"])
-                portfelj.dodaj_instrument(instrument)
+                if instrument_kot_slovar["valuta"] == portfelj.valuta:
+                    cena = slovar_cen[instrument_kot_slovar["kratica"]]
+                    instrument = Instrument(
+                        instrument_kot_slovar["kratica"],
+                        instrument_kot_slovar["ime"],
+                        portfelj,
+                        instrument_kot_slovar["kratica"],
+                        cena
+                    )
+                    portfelj.dodaj_instrument(instrument)
+                else:
+                    cena_v_valuti_delnice = slovar_cen[instrument_kot_slovar["kratica"]]
+                    cena = cena_v_valuti_delnice / (YahooFinancials(portfelj.valuta + instrument_kot_slovar["valuta"] + "=X").get_current_price())
+                    instrument = Instrument(
+                        instrument_kot_slovar["kratica"],
+                        instrument_kot_slovar["ime"],
+                        portfelj,
+                        instrument_kot_slovar["valuta"],
+                        cena
+                    )
+                    portfelj.dodaj_instrument(instrument)                   
             for transakcija_kot_slovar in portfelj_kot_slovar["transakcije"]:
                 transakcija = Transakcija(
                     transakcija_kot_slovar["poteza"], 
@@ -248,7 +269,7 @@ class Portfelj:
         }
 
 class Instrument:
-    def __init__(self, kratica, ime, portfelj, valuta=None):
+    def __init__(self, kratica, ime, portfelj, valuta=None, cena=None):
         self.kratica = kratica
         self.portfelj = portfelj
         self.ime = ime
@@ -256,10 +277,13 @@ class Instrument:
             self.valuta = YahooFinancials(self.kratica).get_currency()
         else:
             self.valuta = valuta
-        if self.valuta == portfelj.valuta:
-            self.cena = YahooFinancials(self.kratica).get_current_price()
+        if cena == None:    
+            if self.valuta == portfelj.valuta:
+                self.cena = YahooFinancials(self.kratica).get_current_price()
+            else:
+                self.cena = YahooFinancials(self.kratica).get_current_price() / YahooFinancials((portfelj.valuta + self.valuta + "=X")).get_current_price()
         else:
-            self.cena = YahooFinancials(self.kratica).get_current_price() / YahooFinancials((portfelj.valuta + self.valuta + "=X")).get_current_price()
+            self.cena = cena
         
 
     def __repr__(self):
